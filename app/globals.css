@@ -39,3 +39,14 @@ pre {
   font-family: "Courier New", Courier, monospace;
   line-height: 1;
 }
+
+/* Custom selection color */
+::selection {
+  background-color: #15803d;
+  color: #000000;
+}
+
+::-moz-selection {
+  background-color: #15803d;
+  color: #000000;
+}

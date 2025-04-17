@@ -1,0 +1,90 @@
+{
+  "name": "Nima",
+  "tagline": "Developer. Systems enthusiast. Building reliable, efficient, and secure software.",
+  "about": [
+    "I'm a systems programmer with a focus on building efficient software. My background spans low-level systems programming, distributed systems, and performance optimization.",
+    "My journey began with traditional programming languages, but I enjoy exploring modern approaches to memory safety and performance. I tackle complex problems and build robust, efficient solutions.",
+    "When not coding, I contribute to open-source projects, write technical articles, and explore the latest developments in systems programming and language design."
+  ],
+  "languages": ["rust", "c", "cpp", "go"],
+  "technologies": ["wasm", "docker", "kubernetes", "linux"],
+  "interests": ["systems", "distributed", "performance", "open-source"],
+  "favoriteFilms": [
+    { "title": "Blade Runner", "director": "Ridley Scott" },
+    { "title": "Akira", "director": "Katsuhiro Otomo" },
+    { "title": "Ghost in the Shell", "director": "Mamoru Oshii" },
+    { "title": "The Matrix", "director": "The Wachowskis" }
+  ],
+  "projects": [
+    {
+      "id": "project-alpha",
+      "title": "project-alpha",
+      "description": "A high-performance, embedded database with ACID compliance and a focus on speed and reliability.",
+      "tags": ["systems", "database", "acid"],
+      "githubUrl": "https://github.com/yourusername/project-alpha"
+    },
+    {
+      "id": "secure-net",
+      "title": "secure-net",
+      "description": "A secure, peer-to-peer networking library focusing on encrypted communications and resilience.",
+      "tags": ["networking", "security", "p2p"],
+      "githubUrl": "https://github.com/yourusername/secure-net"
+    },
+    {
+      "id": "command-toolkit",
+      "title": "command-toolkit",
+      "description": "A modern, feature-rich command-line toolkit for system administrators and developers.",
+      "tags": ["cli", "tools", "devops"],
+      "githubUrl": "https://github.com/yourusername/command-toolkit"
+    }
+  ],
+  "workExperience": [
+    {
+      "title": "Senior Developer",
+      "company": "TechSystems Inc.",
+      "period": "2021 - Present",
+      "description": "Leading the development of high-performance distributed systems. Architected and implemented a fault-tolerant message broker that handles millions of transactions per second.",
+      "tags": ["systems", "distributed", "performance"]
+    },
+    {
+      "title": "Systems Engineer",
+      "company": "DataCraft Solutions",
+      "period": "2018 - 2021",
+      "description": "Developed and maintained critical infrastructure components. Migrated legacy systems to modern technologies, resulting in a 40% performance improvement and elimination of memory-related crashes.",
+      "tags": ["infrastructure", "migration", "optimization"]
+    },
+    {
+      "title": "Software Developer",
+      "company": "InnovateTech",
+      "period": "2016 - 2018",
+      "description": "Worked on backend services and APIs. Started exploring modern languages for performance-critical components, which led to company-wide adoption for new projects.",
+      "tags": ["backend", "api", "services"]
+    }
+  ],
+  "blogPosts": [
+    {
+      "slug": "understanding-modern-memory-management",
+      "title": "Understanding Modern Memory Management: A Deep Dive",
+      "date": "2023-05-15",
+      "excerpt": "An in-depth exploration of memory management systems, borrowing rules, and how they prevent memory safety issues without garbage collection.",
+      "tags": ["systems", "memory-safety"],
+      "content": "# Understanding Modern Memory Management: A Deep Dive\n\nMemory management is one of the most critical aspects of systems programming. In this article, we'll explore how modern programming languages handle memory allocation and deallocation, with a focus on ownership models and borrowing rules.\n\n## Traditional Memory Management\n\nIn languages like C and C++, memory management is manual. Developers are responsible for allocating memory with `malloc` or `new` and deallocating it with `free` or `delete`. This approach offers maximum control but is prone to errors like:\n\n- Memory leaks (forgetting to free memory)\n- Use-after-free bugs\n- Double-free errors\n- Buffer overflows\n\n## Garbage Collection\n\nLanguages like Java, JavaScript, and Python use garbage collection. The runtime automatically tracks object references and frees memory when objects are no longer reachable. While this eliminates many memory-related bugs, it introduces:\n\n- Non-deterministic cleanup\n- Potential performance pauses\n- Higher memory overhead\n- Less control over resource usage\n\n## Modern Ownership Models\n\nModern systems languages have introduced ownership models that provide memory safety without garbage collection:\n\n\`\`\`rust\nfn main() {\n    // 'message' is the owner of this string\n    let message = String::from(\"Hello, world!\");\n    \n    // Ownership is moved to the function\n    print_message(message);\n    \n    // This would cause a compile error - ownership was moved\n    // println!(\"{}\", message);\n}\n\nfn print_message(msg: String) {\n    println!(\"{}\", msg);\n    // 'msg' is dropped (freed) when this function ends\n}\n\`\`\`\n\n### Borrowing Rules\n\nBorrowing allows temporary access to data without transferring ownership:\n\n\`\`\`rust\nfn main() {\n    let message = String::from(\"Hello, world!\");\n    \n    // Borrow the string (reference) - doesn't transfer ownership\n    print_message_length(&message);\n    \n    // Still valid - we still own 'message'\n    println!(\"{}\", message);\n}\n\nfn print_message_length(msg: &String) {\n    println!(\"Length: {}\", msg.len());\n    // No need to free anything - we just borrowed it\n}\n\`\`\`\n\n## Conclusion\n\nModern memory management systems provide safety without sacrificing performance. By enforcing ownership and borrowing rules at compile time, they eliminate entire categories of memory-related bugs while maintaining predictable performance characteristics."
+    },
+    {
+      "slug": "building-high-performance-web-servers",
+      "title": "Building High-Performance Web Servers with Modern Tools",
+      "date": "2023-03-22",
+      "excerpt": "A practical guide to creating blazing-fast web servers using async capabilities and modern runtime environments.",
+      "tags": ["performance", "async", "web"],
+      "content": "# Building High-Performance Web Servers with Modern Tools\n\nCreating high-performance web servers requires understanding both the underlying protocols and the tools available for implementation. This article explores modern approaches to building blazing-fast web servers.\n\n## Async I/O\n\nModern web servers leverage asynchronous I/O to handle thousands of concurrent connections efficiently:\n\n\`\`\`rust\nasync fn handle_connection(mut stream: TcpStream) {\n    let mut buffer = [0; 1024];\n    stream.read(&mut buffer).await.unwrap();\n    \n    let response = \"HTTP/1.1 200 OK\\r\\n\\r\\nHello, World!\";\n    stream.write(response.as_bytes()).await.unwrap();\n    stream.flush().await.unwrap();\n}\n\`\`\`\n\n## Event-Driven Architecture\n\nEvent loops and non-blocking I/O allow servers to handle many connections with minimal resource usage:\n\n\`\`\`javascript\nconst server = http.createServer((req, res) => {\n  res.writeHead(200);\n  res.end('Hello, World!');\n});\n\nserver.listen(8000);\nconsole.log('Server running on port 8000');\n\`\`\`\n\n## Zero-Copy Optimizations\n\nModern APIs allow data to be sent directly from disk to network without unnecessary copying:\n\n\`\`\`c\nsendfile(socket_fd, file_fd, &offset, count);\n\`\`\`\n\n## Conclusion\n\nBy leveraging async I/O, event-driven architectures, and zero-copy optimizations, modern web servers can achieve remarkable performance with minimal resource usage."
+    }
+  ],
+  "socialLinks": {
+    "github": "https://github.com/yourusername",
+    "twitter": "https://twitter.com/yourusername",
+    "linkedin": "https://www.linkedin.com/in/yourusername/",
+    "email": "mailto:you@example.com",
+    "letterboxd": "https://letterboxd.com/yourusername/",
+    "telegram": "https://t.me/yourusername"
+  }
+}
