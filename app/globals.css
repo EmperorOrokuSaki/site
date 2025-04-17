@@ -33,3 +33,9 @@ button:hover {
   background-color: #15803d;
   color: black;
 }
+
+/* For the ASCII art */
+pre {
+  font-family: "Courier New", Courier, monospace;
+  line-height: 1;
+}

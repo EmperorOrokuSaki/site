@@ -1,7 +1,28 @@
 import Link from "next/link"
 import { Github, Twitter, Linkedin, Mail, Send } from "lucide-react"
+import { AsciiArt } from "@/components/ascii-art"
 
-export default function Home() {
+async function getAsciiArt() {
+  try {
+    const response = await fetch(
+      "https://gist.github.com/EmperorOrokuSaki/7afe407cd702a0134dc03366e99f2d3f/raw/2499580714926d39f33266488685ad6b64208653/ascii.txt",
+      { cache: "force-cache" }, // Use Next.js cache
+    )
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch: ${response.status}`)
+    }
+
+    return await response.text()
+  } catch (error) {
+    console.error("Error fetching ASCII art:", error)
+    return "Failed to load ASCII art. Please refresh the page."
+  }
+}
+
+export default async function Home() {
+  const asciiArt = await getAsciiArt()
+
   return (
     <div className="min-h-screen bg-black text-green-400 font-mono p-4">
       <div className="container mx-auto">
@@ -27,14 +48,9 @@ export default function Home() {
 
         <main className="py-8">
           <section className="mb-16 border border-green-700 p-4">
-            <pre className="text-[6px] sm:text-[8px] md:text-[10px] overflow-x-auto text-green-500 whitespace-pre leading-[0.7] tracking-tighter">
-              {`*%##**+*+-+==--=-:=:                                                                                                                                         +##%#%#%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%@@@%@%%%%%%%%%%###.                    
-                      :-...            .:-=+*:                                                                                                                                        :+*####%%%%%#%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%%#%#%####**=:                       
-             :=+*##%%#%%%%%%%%##**++=::                                                                                                                                                   -+***###*#####%#%%%@@@@@@@@@@@@@@@%@@%@@%@@@@@@@@@@@@@@@@@##%#*##****##*=:                            
-      .*%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@##+=-                                                                                                                                            -=********##%@%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%%#******+=                                   
-    +%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%#*:                     .*+=-                                                                                                                     .:+**#*#%#@@@@@@@@@@@@@@@@@@@@@@@@@@%#**=-:                                            
-    -###%%%%@%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%*                  +++==+:                                                                                                                          .=+*#%%%%%%%%%%%%%%%%%%###*=-`}
-            </pre>
+            <div className="overflow-x-auto">
+              <AsciiArt art={asciiArt} />
+            </div>
             <div className="mt-4 border-t border-green-700 pt-4">
               <p className="text-green-300 mb-2">$ whoami</p>
               <p className="text-sm">
@@ -281,7 +297,7 @@ export default function Home() {
               <div className="border border-green-700 p-4">
                 <div className="text-xs mb-2">2023-05-15</div>
                 <h3 className="text-green-300 mb-2">
-                  <Link href="#" className="hover:underline">
+                  <Link href="/writings/understanding-modern-memory-management" className="hover:underline">
                     Understanding Modern Memory Management: A Deep Dive
                   </Link>
                 </h3>
@@ -298,7 +314,7 @@ export default function Home() {
               <div className="border border-green-700 p-4">
                 <div className="text-xs mb-2">2023-03-22</div>
                 <h3 className="text-green-300 mb-2">
-                  <Link href="#" className="hover:underline">
+                  <Link href="/writings/building-high-performance-web-servers" className="hover:underline">
                     Building High-Performance Web Servers with Modern Tools
                   </Link>
                 </h3>
@@ -316,7 +332,7 @@ export default function Home() {
               <div className="border border-green-700 p-4">
                 <div className="text-xs mb-2">2023-01-10</div>
                 <h3 className="text-green-300 mb-2">
-                  <Link href="#" className="hover:underline">
+                  <Link href="/writings/language-migration-guide" className="hover:underline">
                     Language Migration Guide for Systems Programmers
                   </Link>
                 </h3>
@@ -333,7 +349,7 @@ export default function Home() {
             </div>
             <div className="mt-4 text-center">
               <Link
-                href="#"
+                href="/writings"
                 className="inline-block border border-green-700 px-4 py-2 hover:bg-green-700 hover:text-black transition-colors"
               >
                 cat --all
