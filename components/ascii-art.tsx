@@ -1,30 +1,37 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 export function AsciiArt({ art }: { art: string }) {
-  const [isClient, setIsClient] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [isRendered, setIsRendered] = useState(false)
 
-  // Only render on client-side to prevent hydration issues
+  // Use a more efficient rendering approach
   useEffect(() => {
-    setIsClient(true)
-  }, [])
+    if (!art || isRendered) return
 
-  // If the ASCII art is too large, truncate it
-  const safeArt = art.length > 100000 ? art.substring(0, 100000) + "..." : art
+    // Delay rendering slightly to avoid blocking the main thread during initial load
+    const timer = setTimeout(() => {
+      setIsRendered(true)
+    }, 100)
 
-  // Don't render during SSR to prevent hydration mismatch
-  if (!isClient) {
-    return <div className="h-40 w-full bg-green-900/10 animate-pulse"></div>
-  }
+    return () => clearTimeout(timer)
+  }, [art, isRendered])
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center" ref={containerRef}>
       <pre
-        className="text-green-500 whitespace-pre overflow-x-auto max-h-[300px]"
-        style={{ fontSize: "4px", lineHeight: "1" }}
+        className="text-green-500 whitespace-pre overflow-x-auto max-h-[400px]"
+        style={{
+          fontSize: "4px",
+          lineHeight: "1",
+          // Use CSS containment to improve rendering performance
+          contain: "content",
+          // Use hardware acceleration when possible
+          transform: "translateZ(0)",
+        }}
       >
-        {safeArt}
+        {isRendered ? art : "Loading ASCII art..."}
       </pre>
     </div>
   )

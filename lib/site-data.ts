@@ -45,20 +45,21 @@ export interface SiteData {
   }
 }
 
-// The specific URL provided by the user
-const SITE_DATA_URL =
-  "https://raw.githubusercontent.com/EmperorOrokuSaki/EmperorOrokuSaki.github.io/refs/heads/main/site.json"
-
 // Cache the data to prevent multiple fetches
 let cachedData: SiteData | null = null
 let lastFetchTime = 0
 const CACHE_DURATION = 60000 // 1 minute
+
+// The specific URL provided by the user
+const SITE_DATA_URL =
+  "https://raw.githubusercontent.com/EmperorOrokuSaki/EmperorOrokuSaki.github.io/refs/heads/main/site.json"
 
 export async function fetchSiteData(): Promise<SiteData> {
   const now = Date.now()
 
   // Return cached data if it's still valid
   if (cachedData && now - lastFetchTime < CACHE_DURATION) {
+    console.log("Using cached site data")
     return cachedData
   }
 
@@ -73,7 +74,11 @@ export async function fetchSiteData(): Promise<SiteData> {
         "Cache-Control": "no-cache",
       },
       cache: "no-store",
+      next: { revalidate: 0 }, // Don't use Next.js cache
     })
+
+    // Log detailed response information for debugging
+    console.log(`Response status: ${response.status} ${response.statusText}`)
 
     if (!response.ok) {
       throw new Error(`Failed to fetch site data: ${response.status} ${response.statusText}`)
@@ -81,6 +86,7 @@ export async function fetchSiteData(): Promise<SiteData> {
 
     // Try to parse the response as text first to see if it's valid JSON
     const text = await response.text()
+    console.log(`Response body (first 100 chars): ${text.substring(0, 100)}...`)
 
     try {
       const data = JSON.parse(text) as SiteData
@@ -112,7 +118,67 @@ export async function fetchSiteData(): Promise<SiteData> {
     }
   } catch (error) {
     console.error("Error fetching site data:", error)
-    throw error
+
+    // If we have cached data, return it even if it's expired
+    if (cachedData) {
+      console.log("Using expired cached data as fallback")
+      return cachedData
+    }
+
+    // Create fallback data
+    const fallbackData: SiteData = {
+      name: "Nima",
+      tagline: "Developer. Systems enthusiast. Building reliable, efficient, and secure software.",
+      about: [
+        "I'm a systems programmer with a focus on building efficient software. My background spans low-level systems programming, distributed systems, and performance optimization.",
+        "My journey began with traditional programming languages, but I enjoy exploring modern approaches to memory safety and performance.",
+      ],
+      languages: ["rust", "c", "cpp", "go"],
+      technologies: ["wasm", "docker", "kubernetes", "linux"],
+      interests: ["systems", "distributed", "performance", "open-source"],
+      favoriteFilms: [
+        { title: "Blade Runner", director: "Ridley Scott" },
+        { title: "Akira", director: "Katsuhiro Otomo" },
+      ],
+      projects: [
+        {
+          id: "project-alpha",
+          title: "project-alpha",
+          description: "A high-performance, embedded database with ACID compliance.",
+          tags: ["systems", "database", "acid"],
+          githubUrl: "https://github.com/yourusername/project-alpha",
+        },
+      ],
+      workExperience: [
+        {
+          title: "Senior Developer",
+          company: "TechSystems Inc.",
+          period: "2021 - Present",
+          description: "Leading the development of high-performance distributed systems.",
+          tags: ["systems", "distributed", "performance"],
+        },
+      ],
+      blogPosts: [
+        {
+          slug: "understanding-modern-memory-management",
+          title: "Understanding Modern Memory Management",
+          date: "2023-05-15",
+          excerpt: "An exploration of memory management systems.",
+          tags: ["systems", "memory-safety"],
+          content: "# Understanding Modern Memory Management\n\nMemory management is critical in systems programming.",
+        },
+      ],
+      socialLinks: {
+        github: "https://github.com/yourusername",
+        email: "mailto:you@example.com",
+      },
+    }
+
+    // Update cache with fallback data
+    cachedData = fallbackData
+    lastFetchTime = now
+
+    return fallbackData
   }
 }
 

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 
 export function TerminalEffect() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const animationRef = useRef<number | null>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -26,46 +27,61 @@ export function TerminalEffect() {
     const columns = Math.floor(canvas.width / fontSize)
     const drops: number[] = []
 
-    // Initialize drops
-    for (let i = 0; i < columns; i++) {
+    // Initialize drops - reduce density for better performance
+    for (let i = 0; i < columns; i += 2) {
       drops[i] = Math.floor(Math.random() * -100)
     }
 
     // Characters to display
     const chars = "01"
 
-    // Animation loop
-    function draw() {
-      // Semi-transparent black background to create trail effect
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)"
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    // Animation loop with frame limiting
+    let lastTime = 0
+    const fps = 15 // Limit to 15 FPS for better performance
+    const frameInterval = 1000 / fps
 
-      // Green text
-      ctx.fillStyle = "#00550022"
-      ctx.font = `${fontSize}px monospace`
+    function draw(timestamp: number) {
+      const deltaTime = timestamp - lastTime
 
-      // Loop through drops
-      for (let i = 0; i < drops.length; i++) {
-        // Random character
-        const char = chars[Math.floor(Math.random() * chars.length)]
+      if (deltaTime >= frameInterval) {
+        lastTime = timestamp - (deltaTime % frameInterval)
 
-        // Draw character
-        ctx.fillText(char, i * fontSize, drops[i] * fontSize)
+        // Semi-transparent black background to create trail effect
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)"
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-        // Move drop down
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0
+        // Green text
+        ctx.fillStyle = "#00550022"
+        ctx.font = `${fontSize}px monospace`
+
+        // Loop through drops
+        for (let i = 0; i < drops.length; i++) {
+          if (drops[i] === undefined) continue
+
+          // Random character
+          const char = chars[Math.floor(Math.random() * chars.length)]
+
+          // Draw character
+          ctx.fillText(char, i * fontSize, drops[i] * fontSize)
+
+          // Move drop down
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0
+          }
+
+          drops[i]++
         }
-
-        drops[i]++
       }
 
-      requestAnimationFrame(draw)
+      animationRef.current = requestAnimationFrame(draw)
     }
 
-    draw()
+    animationRef.current = requestAnimationFrame(draw)
 
     return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
       window.removeEventListener("resize", setCanvasSize)
     }
   }, [])

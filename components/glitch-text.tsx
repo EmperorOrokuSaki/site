@@ -14,10 +14,13 @@ export function GlitchText({ text, typingSpeed = 80, className = "", glitchInten
   const [displayedText, setDisplayedText] = useState("")
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isGlitching, setIsGlitching] = useState(false)
-  const glitchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Handle typing animation
+  // Use refs to manage timeouts and prevent memory leaks
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const glitchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const glitchDurationRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Handle typing animation with better cleanup
   useEffect(() => {
     if (currentIndex < text.length) {
       typingTimeoutRef.current = setTimeout(() => {
@@ -33,35 +36,39 @@ export function GlitchText({ text, typingSpeed = 80, className = "", glitchInten
     }
   }, [currentIndex, text, typingSpeed])
 
-  // Handle random glitch effect with optimized performance
+  // Handle random glitch effect with better memory management
   useEffect(() => {
     if (displayedText.length > 0) {
       const triggerGlitch = () => {
-        // Random chance to trigger glitch
-        if (Math.random() < 0.3) {
+        // Limit glitch frequency to reduce CPU usage
+        if (Math.random() < 0.2) {
           setIsGlitching(true)
 
           // Turn off glitch after a short duration
-          setTimeout(
+          glitchDurationRef.current = setTimeout(
             () => {
               setIsGlitching(false)
             },
-            Math.random() * 200 + 50,
+            Math.random() * 150 + 50, // Shorter duration to reduce rendering load
           )
         }
 
-        // Schedule next potential glitch
-        const nextGlitch = Math.random() * 2000 + 1000 // Random time between 1-3 seconds
+        // Schedule next potential glitch with longer intervals
+        const nextGlitch = Math.random() * 3000 + 2000 // Random time between 2-5 seconds
         glitchTimeoutRef.current = setTimeout(triggerGlitch, nextGlitch)
       }
 
       // Start the glitch cycle
-      const initialDelay = Math.random() * 1000 + 500
+      const initialDelay = Math.random() * 1000 + 1000
       glitchTimeoutRef.current = setTimeout(triggerGlitch, initialDelay)
 
       return () => {
+        // Clean up all timeouts
         if (glitchTimeoutRef.current) {
           clearTimeout(glitchTimeoutRef.current)
+        }
+        if (glitchDurationRef.current) {
+          clearTimeout(glitchDurationRef.current)
         }
       }
     }

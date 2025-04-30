@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react"
 
 export function ParticleEffect() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const animationRef = useRef<number | null>(null)
+  const particlesRef = useRef<any[]>([])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -57,13 +59,15 @@ export function ParticleEffect() {
       }
     }
 
-    // Create particles
-    const particleCount = Math.min(100, Math.floor((window.innerWidth * window.innerHeight) / 10000))
+    // Create particles - reduce count for better performance
+    const particleCount = Math.min(50, Math.floor((window.innerWidth * window.innerHeight) / 20000))
     const particles: Particle[] = []
 
     for (let i = 0; i < particleCount; i++) {
       particles.push(new Particle())
     }
+
+    particlesRef.current = particles
 
     // Mouse interaction
     const mouse = {
@@ -82,54 +86,70 @@ export function ParticleEffect() {
       mouse.y = null
     })
 
-    // Animation loop
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
+    // Animation loop with frame limiting
+    let lastTime = 0
+    const fps = 30 // Limit to 30 FPS for better performance
+    const frameInterval = 1000 / fps
 
-      // Draw connections
-      ctx.strokeStyle = "rgba(16, 185, 129, 0.05)"
-      ctx.lineWidth = 0.5
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x
-          const dy = particles[i].y - particles[j].y
-          const distance = Math.sqrt(dx * dx + dy * dy)
+    function animate(timestamp: number) {
+      const deltaTime = timestamp - lastTime
 
-          if (distance < 100) {
-            ctx.beginPath()
-            ctx.moveTo(particles[i].x, particles[i].y)
-            ctx.lineTo(particles[j].x, particles[j].y)
-            ctx.stroke()
+      if (deltaTime >= frameInterval) {
+        lastTime = timestamp - (deltaTime % frameInterval)
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+        // Draw connections - limit connections to reduce calculations
+        ctx.strokeStyle = "rgba(16, 185, 129, 0.05)"
+        ctx.lineWidth = 0.5
+
+        // Only draw connections for a subset of particles
+        const connectionLimit = Math.min(particles.length, 20)
+        for (let i = 0; i < connectionLimit; i++) {
+          for (let j = i; j < connectionLimit; j++) {
+            const dx = particles[i].x - particles[j].x
+            const dy = particles[i].y - particles[j].y
+            const distance = Math.sqrt(dx * dx + dy * dy)
+
+            if (distance < 100) {
+              ctx.beginPath()
+              ctx.moveTo(particles[i].x, particles[i].y)
+              ctx.lineTo(particles[j].x, particles[j].y)
+              ctx.stroke()
+            }
+          }
+        }
+
+        // Update and draw particles
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].update()
+          particles[i].draw()
+
+          // Mouse interaction
+          if (mouse.x !== null && mouse.y !== null) {
+            const dx = particles[i].x - mouse.x
+            const dy = particles[i].y - mouse.y
+            const distance = Math.sqrt(dx * dx + dy * dy)
+
+            if (distance < mouse.radius) {
+              const angle = Math.atan2(dy, dx)
+              const force = (mouse.radius - distance) / mouse.radius
+              particles[i].x += Math.cos(angle) * force
+              particles[i].y += Math.sin(angle) * force
+            }
           }
         }
       }
 
-      // Update and draw particles
-      for (let i = 0; i < particles.length; i++) {
-        particles[i].update()
-        particles[i].draw()
-
-        // Mouse interaction
-        if (mouse.x !== null && mouse.y !== null) {
-          const dx = particles[i].x - mouse.x
-          const dy = particles[i].y - mouse.y
-          const distance = Math.sqrt(dx * dx + dy * dy)
-
-          if (distance < mouse.radius) {
-            const angle = Math.atan2(dy, dx)
-            const force = (mouse.radius - distance) / mouse.radius
-            particles[i].x += Math.cos(angle) * force
-            particles[i].y += Math.sin(angle) * force
-          }
-        }
-      }
-
-      requestAnimationFrame(animate)
+      animationRef.current = requestAnimationFrame(animate)
     }
 
-    animate()
+    animationRef.current = requestAnimationFrame(animate)
 
     return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
       window.removeEventListener("resize", setCanvasSize)
       canvas.removeEventListener("mousemove", () => {})
       canvas.removeEventListener("mouseleave", () => {})

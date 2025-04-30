@@ -1,30 +1,57 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Github, Linkedin, Mail, Film, X } from "lucide-react"
+import { AsciiArt } from "@/components/ascii-art"
 import { GlitchText } from "@/components/glitch-text"
 import { fetchSiteData, type SiteData } from "@/lib/site-data"
 import { TelegramIcon } from "@/components/telegram-icon"
-import { AsciiArt } from "@/components/ascii-art"
 
 export default function Home() {
   const [asciiArt, setAsciiArt] = useState<string>("")
   const [siteData, setSiteData] = useState<SiteData | null>(null)
   const [error, setError] = useState<Error | null>(null)
   const [loading, setLoading] = useState(true)
-  const [showAsciiArt, setShowAsciiArt] = useState(false)
 
-  // Fetch data on client-side to prevent SSR issues
+  // Fetch ASCII art from our optimized endpoint
+  useEffect(() => {
+    async function fetchAsciiArt() {
+      try {
+        const response = await fetch("/api/optimized-ascii")
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ASCII art: ${response.status}`)
+        }
+        const data = await response.json()
+        setAsciiArt(data.ascii || "")
+      } catch (err) {
+        console.error("Error fetching ASCII art:", err)
+        // Fallback to a simpler ASCII art if there's an error
+        setAsciiArt("ASCII Art Loading Error")
+      }
+    }
+
+    fetchAsciiArt()
+  }, [])
+
+  // Fetch site data
   useEffect(() => {
     async function loadData() {
       try {
         setLoading(true)
-
-        // Fetch site data
         const data = await fetchSiteData()
-        setSiteData(data)
 
+        // Ensure all required arrays exist
+        data.about = data.about || []
+        data.languages = data.languages || []
+        data.technologies = data.technologies || []
+        data.interests = data.interests || []
+        data.favoriteFilms = data.favoriteFilms || []
+        data.projects = data.projects || []
+        data.workExperience = data.workExperience || []
+        data.blogPosts = data.blogPosts || []
+
+        setSiteData(data)
         setLoading(false)
       } catch (err) {
         setError(err instanceof Error ? err : new Error("Unknown error fetching site data"))
@@ -35,33 +62,6 @@ export default function Home() {
 
     loadData()
   }, [])
-
-  // Separate effect for ASCII art to prevent blocking the main content
-  useEffect(() => {
-    async function loadAsciiArt() {
-      try {
-        const response = await fetch(
-          "https://gist.github.com/EmperorOrokuSaki/7afe407cd702a0134dc03366e99f2d3f/raw/2499580714926d39f33266488685ad6b64208653/ascii.txt",
-          { cache: "force-cache" },
-        )
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.status}`)
-        }
-
-        const text = await response.text()
-        setAsciiArt(text)
-      } catch (error) {
-        console.error("Error fetching ASCII art:", error)
-        setAsciiArt("Failed to load ASCII art. Please refresh the page.")
-      }
-    }
-
-    // Only load ASCII art if user chooses to show it
-    if (showAsciiArt) {
-      loadAsciiArt()
-    }
-  }, [showAsciiArt])
 
   if (loading) {
     return (
@@ -97,6 +97,20 @@ export default function Home() {
                 >
                   Retry
                 </button>
+              </div>
+            </section>
+
+            <section className="mb-16 border border-green-700 p-4">
+              <div className="text-center mb-4">
+                <GlitchText
+                  text="Explo(it/r)ing the world!"
+                  className="text-green-300 text-lg"
+                  typingSpeed={80}
+                  glitchIntensity="subtle"
+                />
+              </div>
+              <div className="flex justify-center">
+                <AsciiArt art={asciiArt} />
               </div>
             </section>
           </main>
@@ -139,39 +153,16 @@ export default function Home() {
                 glitchIntensity="subtle"
               />
             </div>
-
-            {!showAsciiArt ? (
-              <div className="text-center py-8">
-                <button
-                  onClick={() => setShowAsciiArt(true)}
-                  className="border border-green-700 px-4 py-2 hover:bg-green-700 hover:text-black transition-colors"
-                >
-                  Show ASCII Art
-                </button>
-                <p className="text-xs mt-2 text-green-600">
-                  Note: Loading the ASCII art may cause performance issues on some devices
-                </p>
-              </div>
-            ) : (
-              <div>
-                <AsciiArt art={asciiArt} />
-                <div className="text-center mt-2">
-                  <button
-                    onClick={() => setShowAsciiArt(false)}
-                    className="text-xs text-green-600 hover:text-green-400"
-                  >
-                    Hide ASCII Art
-                  </button>
-                </div>
-              </div>
-            )}
-
+            <div className="flex justify-center">
+              <AsciiArt art={asciiArt} />
+            </div>
             <div className="mt-4 border-t border-green-700 pt-4">
               <p className="text-green-300 mb-2">$ whoami</p>
               <p className="text-sm">{siteData?.tagline || ""}</p>
             </div>
           </section>
 
+          {/* Rest of the component remains the same */}
           <section id="about" className="mb-16">
             <div className="border-b border-green-700 mb-4 pb-2 flex items-center">
               <h2 className="text-xl">
@@ -293,7 +284,7 @@ export default function Home() {
               </h2>
             </div>
             <div className="space-y-4">
-              {(siteData?.blogPosts || []).slice(0, 3).map((post) => (
+              {(siteData?.blogPosts || []).map((post) => (
                 <div key={post.slug} className="border border-green-700 p-4">
                   <div className="text-xs mb-2">{post.date}</div>
                   <h3 className="text-green-300 mb-2">
@@ -312,16 +303,14 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            {(siteData?.blogPosts?.length || 0) > 3 && (
-              <div className="mt-4 text-center">
-                <Link
-                  href="/writings"
-                  className="inline-block border border-green-700 px-4 py-2 hover:bg-green-700 hover:text-black transition-colors"
-                >
-                  cat --all
-                </Link>
-              </div>
-            )}
+            <div className="mt-4 text-center">
+              <Link
+                href="/writings"
+                className="inline-block border border-green-700 px-4 py-2 hover:bg-green-700 hover:text-black transition-colors"
+              >
+                cat --all
+              </Link>
+            </div>
           </section>
 
           <section id="contact" className="mb-16">
