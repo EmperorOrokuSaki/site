@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 
 interface GlitchTextProps {
@@ -14,20 +14,26 @@ export function GlitchText({ text, typingSpeed = 80, className = "", glitchInten
   const [displayedText, setDisplayedText] = useState("")
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isGlitching, setIsGlitching] = useState(false)
+  const glitchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Handle typing animation
   useEffect(() => {
     if (currentIndex < text.length) {
-      const timeout = setTimeout(() => {
+      typingTimeoutRef.current = setTimeout(() => {
         setDisplayedText((prev) => prev + text[currentIndex])
         setCurrentIndex((prev) => prev + 1)
       }, typingSpeed)
 
-      return () => clearTimeout(timeout)
+      return () => {
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current)
+        }
+      }
     }
   }, [currentIndex, text, typingSpeed])
 
-  // Handle random glitch effect
+  // Handle random glitch effect with optimized performance
   useEffect(() => {
     if (displayedText.length > 0) {
       const triggerGlitch = () => {
@@ -46,14 +52,18 @@ export function GlitchText({ text, typingSpeed = 80, className = "", glitchInten
 
         // Schedule next potential glitch
         const nextGlitch = Math.random() * 2000 + 1000 // Random time between 1-3 seconds
-        setTimeout(triggerGlitch, nextGlitch)
+        glitchTimeoutRef.current = setTimeout(triggerGlitch, nextGlitch)
       }
 
       // Start the glitch cycle
       const initialDelay = Math.random() * 1000 + 500
-      const timeout = setTimeout(triggerGlitch, initialDelay)
+      glitchTimeoutRef.current = setTimeout(triggerGlitch, initialDelay)
 
-      return () => clearTimeout(timeout)
+      return () => {
+        if (glitchTimeoutRef.current) {
+          clearTimeout(glitchTimeoutRef.current)
+        }
+      }
     }
   }, [displayedText])
 

@@ -1,20 +1,45 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { fetchSiteData } from "@/lib/site-data"
 
-export default async function WritingsPage() {
-  // Fetch site data - will throw an error if it fails
-  let blogPosts = []
-  let error: Error | null = null
+export default function WritingsPage() {
+  const [blogPosts, setBlogPosts] = useState([])
+  const [error, setError] = useState<Error | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  try {
-    const siteData = await fetchSiteData()
-    blogPosts = siteData.blogPosts || []
-  } catch (err) {
-    error = err instanceof Error ? err : new Error("Unknown error fetching site data")
-    console.error("Error fetching site data:", error)
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true)
+        const siteData = await fetchSiteData()
+        setBlogPosts(siteData.blogPosts || [])
+        setLoading(false)
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error("Unknown error fetching site data"))
+        console.error("Error fetching site data:", err)
+        setLoading(false)
+      }
+    }
 
-    // Return error page
+    loadData()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-green-400 font-mono p-4">
+        <div className="container mx-auto">
+          <div className="flex justify-center items-center h-screen">
+            <div className="animate-pulse">Loading...</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
     return (
       <div className="min-h-screen bg-black text-green-400 font-mono p-4">
         <div className="container mx-auto">

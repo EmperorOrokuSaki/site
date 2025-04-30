@@ -49,7 +49,19 @@ export interface SiteData {
 const SITE_DATA_URL =
   "https://raw.githubusercontent.com/EmperorOrokuSaki/EmperorOrokuSaki.github.io/refs/heads/main/site.json"
 
+// Cache the data to prevent multiple fetches
+let cachedData: SiteData | null = null
+let lastFetchTime = 0
+const CACHE_DURATION = 60000 // 1 minute
+
 export async function fetchSiteData(): Promise<SiteData> {
+  const now = Date.now()
+
+  // Return cached data if it's still valid
+  if (cachedData && now - lastFetchTime < CACHE_DURATION) {
+    return cachedData
+  }
+
   try {
     console.log(`Fetching site data from: ${SITE_DATA_URL}`)
 
@@ -61,11 +73,7 @@ export async function fetchSiteData(): Promise<SiteData> {
         "Cache-Control": "no-cache",
       },
       cache: "no-store",
-      next: { revalidate: 0 }, // Don't use Next.js cache
     })
-
-    // Log detailed response information for debugging
-    console.log(`Response status: ${response.status} ${response.statusText}`)
 
     if (!response.ok) {
       throw new Error(`Failed to fetch site data: ${response.status} ${response.statusText}`)
@@ -73,14 +81,10 @@ export async function fetchSiteData(): Promise<SiteData> {
 
     // Try to parse the response as text first to see if it's valid JSON
     const text = await response.text()
-    console.log(`Response body (first 100 chars): ${text.substring(0, 100)}...`)
 
     try {
       const data = JSON.parse(text) as SiteData
       console.log("Site data fetched and parsed successfully")
-
-      // Log the structure to help debug
-      console.log("Data structure:", Object.keys(data))
 
       // Ensure all required properties exist
       const defaultData: Partial<SiteData> = {
@@ -97,7 +101,11 @@ export async function fetchSiteData(): Promise<SiteData> {
         socialLinks: data.socialLinks || {},
       }
 
-      return defaultData as SiteData
+      // Update cache
+      cachedData = defaultData as SiteData
+      lastFetchTime = now
+
+      return cachedData
     } catch (parseError) {
       console.error("Error parsing JSON:", parseError)
       throw new Error(`Invalid JSON response: ${parseError instanceof Error ? parseError.message : String(parseError)}`)

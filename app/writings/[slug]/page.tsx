@@ -1,22 +1,55 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { useParams } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { fetchSiteData, blogPostsToRecord, type BlogPost } from "@/lib/site-data"
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const { slug } = params
+export default function BlogPostPage() {
+  const { slug } = useParams() as { slug: string }
+  const [post, setPost] = useState<BlogPost | null>(null)
+  const [error, setError] = useState<Error | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
 
-  // Fetch site data - will throw an error if it fails
-  let blogPosts: Record<string, BlogPost> = {}
-  let error: Error | null = null
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true)
+        const siteData = await fetchSiteData()
+        const blogPosts = blogPostsToRecord(siteData.blogPosts)
 
-  try {
-    const siteData = await fetchSiteData()
-    blogPosts = blogPostsToRecord(siteData.blogPosts)
-  } catch (err) {
-    error = err instanceof Error ? err : new Error("Unknown error fetching site data")
-    console.error("Error fetching site data:", error)
+        if (blogPosts[slug]) {
+          setPost(blogPosts[slug])
+        } else {
+          setNotFound(true)
+        }
 
-    // Return error page
+        setLoading(false)
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error("Unknown error fetching site data"))
+        console.error("Error fetching site data:", err)
+        setLoading(false)
+      }
+    }
+
+    loadData()
+  }, [slug])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-green-400 font-mono p-4">
+        <div className="container mx-auto">
+          <div className="flex justify-center items-center h-screen">
+            <div className="animate-pulse">Loading...</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
     return (
       <div className="min-h-screen bg-black text-green-400 font-mono p-4">
         <div className="container mx-auto">
@@ -46,9 +79,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     )
   }
 
-  const post = blogPosts[slug]
-
-  if (!post) {
+  if (notFound) {
     return (
       <div className="min-h-screen bg-black text-green-400 font-mono p-4">
         <div className="container mx-auto">
@@ -89,10 +120,10 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         <main className="py-8">
           <article className="border border-green-700">
             <div className="border-b border-green-700 bg-green-900/20 p-4">
-              <div className="text-xs mb-2">{post.date}</div>
-              <h1 className="text-xl text-green-300">{post.title}</h1>
+              <div className="text-xs mb-2">{post?.date}</div>
+              <h1 className="text-xl text-green-300">{post?.title}</h1>
               <div className="flex flex-wrap gap-2 mt-4">
-                {(post.tags || []).map((tag) => (
+                {(post?.tags || []).map((tag) => (
                   <span key={tag} className="border border-green-700 px-2 py-1 text-xs">
                     {tag}
                   </span>
@@ -101,7 +132,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             </div>
             <div className="p-4">
               <div className="prose prose-invert prose-sm max-w-none prose-pre:bg-black prose-pre:border prose-pre:border-green-700">
-                {post.content?.split("\n").map((line, i) => {
+                {post?.content?.split("\n").map((line, i) => {
                   if (line.startsWith("# ")) {
                     return (
                       <h1 key={i} className="text-xl text-green-300 mt-6 mb-4">
