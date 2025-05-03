@@ -78,6 +78,17 @@ export async function fetchSiteData(): Promise<SiteData> {
     const data = (await response.json()) as SiteData
     console.log("Site data fetched successfully from API route")
 
+    // Ensure blog posts have content
+    if (data.blogPosts) {
+      data.blogPosts = data.blogPosts.map((post) => {
+        if (!post.content) {
+          // Provide default content if missing
+          post.content = `# ${post.title}\n\n${post.excerpt}\n\nThis post is currently being written. Check back soon for the full content!`
+        }
+        return post
+      })
+    }
+
     // Update cache
     cachedData = data
     lastFetchTime = now

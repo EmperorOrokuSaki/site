@@ -123,13 +123,13 @@ export function GlitchText({ text, typingSpeed = 80, className = "", glitchInten
         }
         
         .glitch-subtle.glitching::before {
-          color: #0ff;
+          @apply text-blue-500 dark:text-cyan-400;
           z-index: -1;
           animation: glitch-anim-1 0.2s linear infinite alternate-reverse;
         }
         
         .glitch-subtle.glitching::after {
-          color: #f0f;
+          @apply text-red-500 dark:text-fuchsia-400;
           z-index: -2;
           animation: glitch-anim-2 0.3s linear infinite alternate-reverse;
         }

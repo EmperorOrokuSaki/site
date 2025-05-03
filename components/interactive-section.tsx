@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
+import { ScratchReveal } from "./scratch-reveal"
 
 // Define a particle class for the letters
 interface Particle {
@@ -14,39 +15,45 @@ interface Particle {
   maxLife: number
 }
 
-export function AsciiArt({ art }: { art: string }) {
+interface InteractiveSectionProps {
+  children: ReactNode
+  className?: string
+  includeScratchReveal?: boolean
+  scratchText?: string
+}
+
+export function InteractiveSection({
+  children,
+  className = "",
+  includeScratchReveal = true,
+  scratchText = "answer the call of uncertainty",
+}: InteractiveSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [isRendered, setIsRendered] = useState(false)
+  const cursorCanvasRef = useRef<HTMLCanvasElement>(null)
   const [isHovering, setIsHovering] = useState(false)
   const animationRef = useRef<number | null>(null)
+  const cursorAnimationRef = useRef<number | null>(null)
   const mousePos = useRef({ x: 0, y: 0 })
   const particles = useRef<Particle[]>([])
   const lastEmitTime = useRef(0)
 
-  // Use a more efficient rendering approach
-  useEffect(() => {
-    if (!art || isRendered) return
-
-    // Delay rendering slightly to avoid blocking the main thread during initial load
-    const timer = setTimeout(() => {
-      setIsRendered(true)
-    }, 100)
-
-    return () => clearTimeout(timer)
-  }, [art, isRendered])
-
   // Handle the mouse effect
   useEffect(() => {
     const canvas = canvasRef.current
+    const cursorCanvas = cursorCanvasRef.current
     const container = containerRef.current
-    if (!canvas || !container) return
+    if (!canvas || !container || !cursorCanvas) return
 
     // Set canvas size to match container
     const updateCanvasSize = () => {
       const rect = container.getBoundingClientRect()
       canvas.width = rect.width
       canvas.height = rect.height
+
+      // Also update cursor canvas
+      cursorCanvas.width = rect.width
+      cursorCanvas.height = rect.height
     }
 
     updateCanvasSize()
@@ -147,8 +154,58 @@ export function AsciiArt({ art }: { art: string }) {
       animationRef.current = requestAnimationFrame(animate)
     }
 
-    // Start animation
+    // Animation function for the custom cursor
+    const animateCursor = () => {
+      const ctx = cursorCanvas.getContext("2d")
+      if (!ctx) return
+
+      // Clear canvas
+      ctx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height)
+
+      if (isHovering) {
+        // Get the current ASCII color from CSS variable
+        const computedStyle = getComputedStyle(document.documentElement)
+        const asciiColor = computedStyle.getPropertyValue("--ascii-color").trim()
+
+        // Draw custom cursor
+        ctx.beginPath()
+
+        // Outer ring
+        ctx.arc(mousePos.current.x, mousePos.current.y, 12, 0, Math.PI * 2)
+        ctx.strokeStyle = asciiColor || "#4ade80"
+        ctx.lineWidth = 1.5
+        ctx.stroke()
+
+        // Inner dot
+        ctx.beginPath()
+        ctx.arc(mousePos.current.x, mousePos.current.y, 3, 0, Math.PI * 2)
+        ctx.fillStyle = asciiColor || "#4ade80"
+        ctx.fill()
+
+        // Crosshair lines
+        ctx.beginPath()
+        // Horizontal line
+        ctx.moveTo(mousePos.current.x - 18, mousePos.current.y)
+        ctx.lineTo(mousePos.current.x - 8, mousePos.current.y)
+        ctx.moveTo(mousePos.current.x + 8, mousePos.current.y)
+        ctx.lineTo(mousePos.current.x + 18, mousePos.current.y)
+        // Vertical line
+        ctx.moveTo(mousePos.current.x, mousePos.current.y - 18)
+        ctx.lineTo(mousePos.current.x, mousePos.current.y - 8)
+        ctx.moveTo(mousePos.current.x, mousePos.current.y + 8)
+        ctx.lineTo(mousePos.current.x, mousePos.current.y + 18)
+
+        ctx.strokeStyle = asciiColor || "#4ade80"
+        ctx.lineWidth = 1
+        ctx.stroke()
+      }
+
+      cursorAnimationRef.current = requestAnimationFrame(animateCursor)
+    }
+
+    // Start animations
     animationRef.current = requestAnimationFrame(animate)
+    cursorAnimationRef.current = requestAnimationFrame(animateCursor)
 
     // Cleanup
     return () => {
@@ -159,32 +216,33 @@ export function AsciiArt({ art }: { art: string }) {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current)
       }
+      if (cursorAnimationRef.current) {
+        cancelAnimationFrame(cursorAnimationRef.current)
+      }
     }
   }, [isHovering])
 
   return (
-    <div className="flex justify-center" ref={containerRef}>
-      <pre
-        className="whitespace-pre overflow-x-auto max-h-[400px]"
-        style={{
-          fontSize: "4px",
-          lineHeight: "1",
-          // Use CSS containment to improve rendering performance
-          contain: "content",
-          // Use hardware acceleration when possible
-          transform: "translateZ(0)",
-          // Use CSS variable for color
-          color: "var(--ascii-color)",
-          // Prevent text selection
-          userSelect: "none",
-          WebkitUserSelect: "none",
-          MozUserSelect: "none",
-          msUserSelect: "none",
-        }}
-      >
-        {isRendered ? art : "Loading ASCII art..."}
-      </pre>
-      <canvas ref={canvasRef} className="absolute pointer-events-none" style={{ zIndex: 1 }} />
+    <div
+      className={`relative ${className}`}
+      ref={containerRef}
+      style={{ cursor: "none" }} // Hide the default cursor
+    >
+      {children}
+
+      {/* Add the scratch reveal component that covers the entire section */}
+      {includeScratchReveal && <ScratchReveal text={scratchText} />}
+
+      <canvas
+        ref={canvasRef}
+        className="absolute top-0 left-0 w-full h-full pointer-events-none"
+        style={{ zIndex: 1 }}
+      />
+      <canvas
+        ref={cursorCanvasRef}
+        className="absolute top-0 left-0 w-full h-full pointer-events-none"
+        style={{ zIndex: 2 }} // Make sure cursor is above particles
+      />
     </div>
   )
 }

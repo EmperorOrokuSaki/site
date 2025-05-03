@@ -2,36 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-overlay: transparent;
+  --text-primary: #4ade80;
+  --text-secondary: #86efac;
+  --text-muted: #22c55e;
+  --border-color: #15803d;
+  --hover-bg: #15803d;
+  --hover-text: #000000;
+  --ascii-color: #22c55e; /* Default ASCII art color for dark mode */
+  --page-bg: #000000; /* Black background for dark mode */
+}
+
+.light {
+  --bg-overlay: rgba(251, 251, 253, 0.95); /* #fbfbfd with 95% opacity */
+  --text-primary: #1e1e20;
+  --text-secondary: #324fcf;
+  --text-muted: #9aa1ab;
+  --border-color: #d0d6dd;
+  --hover-bg: #324fcf; /* Using Text Secondary color for hover background */
+  --hover-text: #ffffff; /* White text on blue background for good contrast */
+  --ascii-color: #3e86ff;
+  --page-bg: #fbfbfd; /* Light background for light mode */
+}
+
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  background-color: black;
-  color: #4ade80;
+  background-color: var(--page-bg); /* Apply the background color to the entire body */
   font-family: "Courier New", Courier, monospace;
+  color: var(--text-primary);
 }
 
+/* Container styling for light/dark modes */
+.content-container {
+  @apply bg-transparent;
+}
+
+/* Border colors */
+.border-theme {
+  border-color: var(--border-color);
+}
+
+/* Text colors */
+.text-theme-primary {
+  color: var(--text-primary);
+}
+
+.text-theme-secondary {
+  color: var(--text-secondary);
+}
+
+.text-theme-muted {
+  color: var(--text-muted);
+}
+
+/* Link hover */
 a:hover {
-  color: #86efac;
+  color: var(--text-secondary);
 }
 
+/* Input and textarea */
 input,
 textarea {
-  background-color: black;
-  color: #4ade80;
-  border-color: #15803d;
+  border-color: var(--border-color);
+}
+
+.light input,
+.light textarea {
+  @apply bg-gray-100;
+  color: var(--text-primary);
+}
+
+.dark input,
+.dark textarea {
+  @apply bg-black;
+  color: var(--text-primary);
 }
 
 input:focus,
 textarea:focus {
-  outline: none;
-  border-color: #22c55e;
+  @apply outline-none;
+  border-color: var(--text-secondary);
 }
 
+/* Button hover */
 button:hover {
-  background-color: #15803d;
-  color: black;
+  background-color: var(--hover-bg);
+  color: var(--hover-text);
 }
 
 /* For the ASCII art */
@@ -40,13 +100,21 @@ pre {
   line-height: 1;
 }
 
+/* Make ASCII art non-selectable */
+.ascii-art-container pre {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
 /* Custom selection color */
 ::selection {
-  background-color: #15803d;
-  color: #000000;
+  background-color: var(--hover-bg);
+  color: var(--hover-text);
 }
 
 ::-moz-selection {
-  background-color: #15803d;
-  color: #000000;
+  background-color: var(--hover-bg);
+  color: var(--hover-text);
 }

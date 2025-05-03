@@ -42,6 +42,15 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Terminal theme colors
+        terminal: {
+          light: "#f3f4f6", // gray-100
+          dark: "#000000", // black
+          green: {
+            light: "#4b5563", // gray-600
+            dark: "#4ade80", // green-400
+          },
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

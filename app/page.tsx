@@ -7,6 +7,8 @@ import { AsciiArt } from "@/components/ascii-art"
 import { GlitchText } from "@/components/glitch-text"
 import { fetchSiteData, type SiteData } from "@/lib/site-data"
 import { TelegramIcon } from "@/components/telegram-icon"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { InteractiveSection } from "@/components/interactive-section"
 
 export default function Home() {
   const [asciiArt, setAsciiArt] = useState<string>("")
@@ -65,10 +67,10 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-green-400 font-mono p-4">
+      <div className="min-h-screen p-4">
         <div className="container mx-auto">
           <div className="flex justify-center items-center h-screen">
-            <div className="animate-pulse">Loading...</div>
+            <div className="animate-pulse text-theme-primary">Loading...</div>
           </div>
         </div>
       </div>
@@ -77,11 +79,11 @@ export default function Home() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black text-green-400 font-mono p-4">
+      <div className="min-h-screen p-4">
         <div className="container mx-auto">
-          <header className="flex justify-between items-center border-b border-green-700 pb-4">
+          <header className="flex justify-between items-center border-b border-theme pb-4">
             <div className="text-lg">
-              <span>~/error</span> <span className="text-green-300">$</span>
+              <span>~/error</span> <span className="text-theme-secondary">$</span>
             </div>
           </header>
 
@@ -93,18 +95,18 @@ export default function Home() {
               <div className="mt-6">
                 <button
                   onClick={() => window.location.reload()}
-                  className="border border-green-700 px-4 py-2 hover:bg-green-700 hover:text-black transition-colors"
+                  className="border border-theme px-4 py-2 hover:bg-gray-400 hover:text-gray-900 dark:hover:bg-green-700 dark:hover:text-black transition-colors"
                 >
                   Retry
                 </button>
               </div>
             </section>
 
-            <section className="mb-16 border border-green-700 p-4">
+            <InteractiveSection className="mb-16 border border-theme p-4">
               <div className="text-center mb-4">
                 <GlitchText
                   text="Explo(it/r)ing the world!"
-                  className="text-green-300 text-lg"
+                  className="text-theme-secondary text-lg"
                   typingSpeed={80}
                   glitchIntensity="subtle"
                 />
@@ -112,7 +114,7 @@ export default function Home() {
               <div className="flex justify-center">
                 <AsciiArt art={asciiArt} />
               </div>
-            </section>
+            </InteractiveSection>
           </main>
         </div>
       </div>
@@ -121,34 +123,37 @@ export default function Home() {
 
   // If we got here, we have site data
   return (
-    <div className="min-h-screen bg-black text-green-400 font-mono p-4">
+    <div className="min-h-screen p-4">
       <div className="container mx-auto">
-        <header className="flex justify-between items-center border-b border-green-700 pb-4">
+        <header className="flex justify-between items-center border-b border-theme pb-4">
           <div className="text-lg">
-            <span>~/{siteData?.name?.toLowerCase() || "user"}</span> <span className="text-green-300">$</span>
+            <span>~/{siteData?.name?.toLowerCase() || "user"}</span> <span className="text-theme-secondary">$</span>
           </div>
-          <nav className="hidden md:flex gap-6">
-            <Link href="#about" className="hover:text-green-300 transition-colors">
-              ./about
-            </Link>
-            <Link href="#projects" className="hover:text-green-300 transition-colors">
-              ./projects
-            </Link>
-            <Link href="#work" className="hover:text-green-300 transition-colors">
-              ./work
-            </Link>
-            <Link href="#writings" className="hover:text-green-300 transition-colors">
-              ./writings
-            </Link>
-          </nav>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <nav className="hidden md:flex gap-6">
+              <Link href="#about" className="text-theme-primary hover:text-theme-secondary transition-colors">
+                ./about
+              </Link>
+              <Link href="#projects" className="text-theme-primary hover:text-theme-secondary transition-colors">
+                ./projects
+              </Link>
+              <Link href="#work" className="text-theme-primary hover:text-theme-secondary transition-colors">
+                ./work
+              </Link>
+              <Link href="#writings" className="text-theme-primary hover:text-theme-secondary transition-colors">
+                ./writings
+              </Link>
+            </nav>
+          </div>
         </header>
 
         <main className="py-8">
-          <section className="mb-16 border border-green-700 p-4">
+          <InteractiveSection className="mb-16 border border-theme p-4">
             <div className="text-center mb-4">
               <GlitchText
                 text="Explo(it/r)ing the world!"
-                className="text-green-300 text-lg"
+                className="text-theme-secondary text-lg"
                 typingSpeed={80}
                 glitchIntensity="subtle"
               />
@@ -156,18 +161,17 @@ export default function Home() {
             <div className="flex justify-center">
               <AsciiArt art={asciiArt} />
             </div>
-            <div className="mt-4 border-t border-green-700 pt-4">
-              <p className="text-green-300 mb-2">$ whoami</p>
+            <div className="mt-4 border-t border-theme pt-4">
+              <p className="text-theme-secondary mb-2">$ whoami</p>
               <p className="text-sm">{siteData?.tagline || ""}</p>
             </div>
-          </section>
+          </InteractiveSection>
 
-          {/* Rest of the component remains the same */}
           <section id="about" className="mb-16">
-            <div className="border-b border-green-700 mb-4 pb-2 flex items-center">
+            <div className="border-b border-theme mb-4 pb-2 flex items-center">
               <h2 className="text-xl">
-                <span className="text-green-300">~/{siteData?.name?.toLowerCase() || "user"}</span> <span>$ cat</span>{" "}
-                <span className="text-green-300">about.txt</span>
+                <span className="text-theme-secondary">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
+                <span>$ cat</span> <span className="text-theme-secondary">about.txt</span>
               </h2>
             </div>
             <div className="grid md:grid-cols-2 gap-8">
@@ -179,19 +183,19 @@ export default function Home() {
                 ))}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="border border-green-700 p-4">
-                  <h3 className="text-green-300 mb-2 text-sm">$ ls favorite_films/</h3>
+                <div className="border border-theme p-4">
+                  <h3 className="text-theme-secondary mb-2 text-sm">$ ls favorite_films/</h3>
                   <ul className="space-y-1 text-xs">
                     {(siteData?.favoriteFilms || []).map((film, index) => (
                       <li key={index}>
                         {film.title}
-                        {film.director && <span className="text-green-600"> // {film.director}</span>}
+                        {film.director && <span className="text-theme-muted"> // {film.director}</span>}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className="border border-green-700 p-4">
-                  <h3 className="text-green-300 mb-2 text-sm">$ ls interests/</h3>
+                <div className="border border-theme p-4">
+                  <h3 className="text-theme-secondary mb-2 text-sm">$ ls interests/</h3>
                   <ul className="space-y-1 text-xs">
                     {(siteData?.interests || []).map((interest, index) => (
                       <li key={index}>{interest}</li>
@@ -203,30 +207,40 @@ export default function Home() {
           </section>
 
           <section id="projects" className="mb-16">
-            <div className="border-b border-green-700 mb-4 pb-2 flex items-center">
+            <div className="border-b border-theme mb-4 pb-2 flex items-center">
               <h2 className="text-xl">
-                <span className="text-green-300">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
-                <span>$ ls -la</span> <span className="text-green-300">projects/</span>
+                <span className="text-theme-secondary">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
+                <span>$ ls -la</span> <span className="text-theme-secondary">projects/</span>
               </h2>
             </div>
             <div className="space-y-4">
               {(siteData?.projects || []).map((project) => (
-                <div key={project.id} className="border border-green-700">
-                  <div className="border-b border-green-700 bg-green-900/20 p-2 flex justify-between items-center">
-                    <h3 className="text-green-300">
+                <div key={project.id} className="border border-theme">
+                  <div className="border-b border-theme bg-gray-300/20 dark:bg-green-900/20 p-2 flex justify-between items-center">
+                    <h3 className="text-theme-secondary">
                       {project.githubUrl ? (
-                        <Link href={project.githubUrl} className="hover:underline">
+                        <a
+                          href={project.githubUrl}
+                          className="hover:underline"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           {project.title}
-                        </Link>
+                        </a>
                       ) : (
                         project.title
                       )}
                     </h3>
                     {project.githubUrl && (
                       <div className="flex gap-2">
-                        <Link href={project.githubUrl} className="text-green-400 hover:text-green-300">
+                        <a
+                          href={project.githubUrl}
+                          className="text-theme-primary hover:text-theme-secondary"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           <Github className="h-4 w-4" />
-                        </Link>
+                        </a>
                       </div>
                     )}
                   </div>
@@ -234,7 +248,7 @@ export default function Home() {
                     <p className="text-xs mb-4">{project.description}</p>
                     <div className="flex flex-wrap gap-2">
                       {(project.tags || []).map((tag) => (
-                        <span key={tag} className="border border-green-700 px-2 py-1 text-xs">
+                        <span key={tag} className="border border-theme px-2 py-1 text-xs">
                           {tag}
                         </span>
                       ))}
@@ -246,17 +260,17 @@ export default function Home() {
           </section>
 
           <section id="work" className="mb-16">
-            <div className="border-b border-green-700 mb-4 pb-2 flex items-center">
+            <div className="border-b border-theme mb-4 pb-2 flex items-center">
               <h2 className="text-xl">
-                <span className="text-green-300">~/{siteData?.name?.toLowerCase() || "user"}</span> <span>$ cat</span>{" "}
-                <span className="text-green-300">work_history.log</span>
+                <span className="text-theme-secondary">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
+                <span>$ cat</span> <span className="text-theme-secondary">work_history.log</span>
               </h2>
             </div>
             <div className="space-y-4">
               {(siteData?.workExperience || []).map((work, index) => (
-                <div key={index} className="border-l-2 border-green-700 pl-4">
+                <div key={index} className="border-l-2 border-theme pl-4">
                   <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
-                    <h3 className="text-green-300">{work.title}</h3>
+                    <h3 className="text-theme-secondary">{work.title}</h3>
                     <div className="text-xs">
                       <span>{work.company}</span>
                       <span className="mx-2">|</span>
@@ -266,7 +280,7 @@ export default function Home() {
                   <p className="text-xs mb-4">{work.description}</p>
                   <div className="flex flex-wrap gap-2">
                     {(work.tags || []).map((tag) => (
-                      <span key={tag} className="border border-green-700 px-2 py-1 text-xs">
+                      <span key={tag} className="border border-theme px-2 py-1 text-xs">
                         {tag}
                       </span>
                     ))}
@@ -277,17 +291,17 @@ export default function Home() {
           </section>
 
           <section id="writings" className="mb-16">
-            <div className="border-b border-green-700 mb-4 pb-2 flex items-center">
+            <div className="border-b border-theme mb-4 pb-2 flex items-center">
               <h2 className="text-xl">
-                <span className="text-green-300">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
-                <span>$ ls -la</span> <span className="text-green-300">writings/</span>
+                <span className="text-theme-secondary">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
+                <span>$ ls -la</span> <span className="text-theme-secondary">writings/</span>
               </h2>
             </div>
             <div className="space-y-4">
               {(siteData?.blogPosts || []).map((post) => (
-                <div key={post.slug} className="border border-green-700 p-4">
+                <div key={post.slug} className="border border-theme p-4">
                   <div className="text-xs mb-2">{post.date}</div>
-                  <h3 className="text-green-300 mb-2">
+                  <h3 className="text-theme-secondary mb-2">
                     <Link href={`/writings/${post.slug}`} className="hover:underline">
                       {post.title}
                     </Link>
@@ -295,7 +309,7 @@ export default function Home() {
                   <p className="text-xs mb-4">{post.excerpt}</p>
                   <div className="flex flex-wrap gap-2">
                     {(post.tags || []).map((tag) => (
-                      <span key={tag} className="border border-green-700 px-2 py-1 text-xs">
+                      <span key={tag} className="border border-theme px-2 py-1 text-xs">
                         {tag}
                       </span>
                     ))}
@@ -306,17 +320,17 @@ export default function Home() {
             <div className="mt-4 text-center">
               <Link
                 href="/writings"
-                className="inline-block border border-green-700 px-4 py-2 hover:bg-green-700 hover:text-black transition-colors"
+                className="inline-block border border-theme px-4 py-2 hover:bg-gray-400 hover:text-gray-900 dark:hover:bg-green-700 dark:hover:text-black transition-colors"
               >
-                cat --all
+                ls --all
               </Link>
             </div>
           </section>
 
           <section id="contact" className="mb-16">
-            <div className="border-b border-green-700 mb-4 pb-2 flex items-center">
+            <div className="border-b border-theme mb-4 pb-2 flex items-center">
               <h2 className="text-xl">
-                <span className="text-green-300">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
+                <span className="text-theme-secondary">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
                 <span>$ ./contact</span>
               </h2>
             </div>
@@ -330,7 +344,9 @@ export default function Home() {
                   Find me on social media or send me an email at{" "}
                   <a
                     href={siteData?.socialLinks?.email || "mailto:me@nimara.xyz"}
-                    className="text-green-300 hover:underline"
+                    className="text-theme-secondary hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     me@nimara.xyz
                   </a>
@@ -340,60 +356,72 @@ export default function Home() {
           </section>
         </main>
 
-        <footer className="border-t border-green-700 py-4">
+        <footer className="border-t border-theme py-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0 text-xs">
-              <span className="text-green-300">~/{siteData?.name?.toLowerCase() || "user"}</span> <span>$ echo</span>{" "}
-              <span className="text-green-300">"© {new Date().getFullYear()}"</span>
+              <span className="text-theme-secondary">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
+              <span>$ echo</span> <span className="text-theme-secondary">"© {new Date().getFullYear()}"</span>
             </div>
             <div className="flex gap-6">
               {siteData?.socialLinks?.github && (
-                <Link
+                <a
                   href={siteData.socialLinks.github}
-                  className="text-green-400 hover:text-green-300 transition-colors"
+                  className="text-theme-primary hover:text-theme-secondary transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <Github className="h-4 w-4" />
-                </Link>
+                </a>
               )}
               {siteData?.socialLinks?.twitter && (
-                <Link
+                <a
                   href={siteData.socialLinks.twitter}
-                  className="text-green-400 hover:text-green-300 transition-colors"
+                  className="text-theme-primary hover:text-theme-secondary transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <X className="h-4 w-4" />
-                </Link>
+                </a>
               )}
               {siteData?.socialLinks?.linkedin && (
-                <Link
+                <a
                   href={siteData.socialLinks.linkedin}
-                  className="text-green-400 hover:text-green-300 transition-colors"
+                  className="text-theme-primary hover:text-theme-secondary transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <Linkedin className="h-4 w-4" />
-                </Link>
+                </a>
               )}
               {siteData?.socialLinks?.email && (
-                <Link
+                <a
                   href={siteData.socialLinks.email}
-                  className="text-green-400 hover:text-green-300 transition-colors"
+                  className="text-theme-primary hover:text-theme-secondary transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <Mail className="h-4 w-4" />
-                </Link>
+                </a>
               )}
               {siteData?.socialLinks?.letterboxd && (
-                <Link
+                <a
                   href={siteData.socialLinks.letterboxd}
-                  className="text-green-400 hover:text-green-300 transition-colors"
+                  className="text-theme-primary hover:text-theme-secondary transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <Film className="h-4 w-4" />
-                </Link>
+                </a>
               )}
               {siteData?.socialLinks?.telegram && (
-                <Link
+                <a
                   href={siteData.socialLinks.telegram}
-                  className="text-green-400 hover:text-green-300 transition-colors"
+                  className="text-theme-primary hover:text-theme-secondary transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <TelegramIcon className="h-4 w-4" />
-                </Link>
+                </a>
               )}
             </div>
           </div>
