@@ -1,45 +1,40 @@
 import { NextResponse } from "next/server"
 
-// Cache the ASCII art in memory to avoid repeated fetches
-let cachedAsciiArt: string | null = null
+// Cache the ASCII art to prevent multiple fetches
+let cachedAscii: string | null = null
 let lastFetchTime = 0
-const CACHE_DURATION = 3600000 // 1 hour in milliseconds
+const CACHE_DURATION = 3600000 // 1 hour
+
+// The Blob URL provided by the user
+const ASCII_URL = "https://fmja5vvgx5vfveeb.public.blob.vercel-storage.com/ascii.txt"
 
 export async function GET() {
   const now = Date.now()
 
-  // Return cached ASCII art if available and not expired
-  if (cachedAsciiArt && now - lastFetchTime < CACHE_DURATION) {
-    return NextResponse.json({ ascii: cachedAsciiArt })
+  // Return cached ASCII art if it's still valid
+  if (cachedAscii && now - lastFetchTime < CACHE_DURATION) {
+    return NextResponse.json({ ascii: cachedAscii })
   }
 
   try {
-    const response = await fetch(
-      "https://gist.github.com/EmperorOrokuSaki/7afe407cd702a0134dc03366e99f2d3f/raw/2499580714926d39f33266488685ad6b64208653/ascii.txt",
-      { next: { revalidate: 3600 } }, // Cache for 1 hour
-    )
+    console.log(`Fetching ASCII art from: ${ASCII_URL}`)
+    const response = await fetch(ASCII_URL, {
+      cache: "no-store", // Don't use browser cache
+    })
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch: ${response.status}`)
+      throw new Error(`Failed to fetch ASCII art: ${response.status}`)
     }
 
     const text = await response.text()
 
-    // Optimize the ASCII art by removing excessive whitespace
-    // This preserves the visual appearance while reducing the size
-    const optimizedText = text
-      .split("\n")
-      .map((line) => line.trimEnd())
-      .join("\n")
-      .trim()
-
     // Update cache
-    cachedAsciiArt = optimizedText
+    cachedAscii = text
     lastFetchTime = now
 
-    return NextResponse.json({ ascii: optimizedText })
+    return NextResponse.json({ ascii: text })
   } catch (error) {
     console.error("Error fetching ASCII art:", error)
-    return NextResponse.json({ error: "Failed to fetch ASCII art" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to load ASCII art" }, { status: 500 })
   }
 }

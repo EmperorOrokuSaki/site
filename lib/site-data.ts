@@ -35,6 +35,7 @@ export interface SiteData {
   projects: Project[]
   workExperience: WorkExperience[]
   blogPosts: BlogPost[]
+  location?: string
   socialLinks: {
     github?: string
     twitter?: string
@@ -76,14 +77,20 @@ export async function fetchSiteData(): Promise<SiteData> {
     }
 
     const data = (await response.json()) as SiteData
+
+    // Check if we got an error response
+    if ("error" in data) {
+      throw new Error(data.error as string)
+    }
+
     console.log("Site data fetched successfully from API route")
 
     // Ensure blog posts have content
     if (data.blogPosts) {
       data.blogPosts = data.blogPosts.map((post) => {
         if (!post.content) {
-          // Provide default content if missing
-          post.content = `# ${post.title}\n\n${post.excerpt}\n\nThis post is currently being written. Check back soon for the full content!`
+          // Provide minimal default content if missing
+          post.content = `# ${post.title}\n\n${post.excerpt}`
         }
         return post
       })

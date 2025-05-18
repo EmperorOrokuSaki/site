@@ -12,6 +12,7 @@ import { InteractiveSection } from "@/components/interactive-section"
 
 export default function Home() {
   const [asciiArt, setAsciiArt] = useState<string>("")
+  const [asciiError, setAsciiError] = useState<boolean>(false)
   const [siteData, setSiteData] = useState<SiteData | null>(null)
   const [error, setError] = useState<Error | null>(null)
   const [loading, setLoading] = useState(true)
@@ -25,11 +26,17 @@ export default function Home() {
           throw new Error(`Failed to fetch ASCII art: ${response.status}`)
         }
         const data = await response.json()
+
+        if (data.error) {
+          throw new Error(data.error)
+        }
+
         setAsciiArt(data.ascii || "")
+        setAsciiError(false)
       } catch (err) {
         console.error("Error fetching ASCII art:", err)
-        // Fallback to a simpler ASCII art if there's an error
-        setAsciiArt("ASCII Art Loading Error")
+        setAsciiError(true)
+        setAsciiArt("")
       }
     }
 
@@ -42,21 +49,10 @@ export default function Home() {
       try {
         setLoading(true)
         const data = await fetchSiteData()
-
-        // Ensure all required arrays exist
-        data.about = data.about || []
-        data.languages = data.languages || []
-        data.technologies = data.technologies || []
-        data.interests = data.interests || []
-        data.favoriteFilms = data.favoriteFilms || []
-        data.projects = data.projects || []
-        data.workExperience = data.workExperience || []
-        data.blogPosts = data.blogPosts || []
-
         setSiteData(data)
         setLoading(false)
       } catch (err) {
-        setError(err instanceof Error ? err : new Error("Unknown error fetching site data"))
+        setError(err instanceof Error ? err : new Error("Technical difficulty: Unable to load site data"))
         console.error("Error fetching site data:", err)
         setLoading(false)
       }
@@ -77,7 +73,7 @@ export default function Home() {
     )
   }
 
-  if (error) {
+  if (error || !siteData) {
     return (
       <div className="min-h-screen p-4">
         <div className="container mx-auto">
@@ -85,13 +81,14 @@ export default function Home() {
             <div className="text-lg">
               <span>~/error</span> <span className="text-theme-secondary">$</span>
             </div>
+            <ThemeToggle />
           </header>
 
           <main className="py-8">
             <section className="mb-16 border border-red-700 p-4 bg-red-900/20">
-              <h1 className="text-xl text-red-400 mb-4">Error Loading Site Data</h1>
-              <p className="mb-4">{error.message}</p>
-              <p>Please check the site data URL and try again.</p>
+              <h1 className="text-xl text-red-400 mb-4">Technical Difficulty</h1>
+              <p className="mb-4">{error?.message || "Unable to load site data"}</p>
+              <p>Please try again later.</p>
               <div className="mt-6">
                 <button
                   onClick={() => window.location.reload()}
@@ -111,9 +108,12 @@ export default function Home() {
                   glitchIntensity="subtle"
                 />
               </div>
-              <div className="flex justify-center">
-                <AsciiArt art={asciiArt} />
-              </div>
+              {!asciiError && asciiArt && (
+                <div className="flex justify-center">
+                  <AsciiArt art={asciiArt} />
+                </div>
+              )}
+              {asciiError && <div className="text-center text-red-400 p-4">Error loading ASCII art</div>}
             </InteractiveSection>
           </main>
         </div>
@@ -127,7 +127,7 @@ export default function Home() {
       <div className="container mx-auto">
         <header className="flex justify-between items-center border-b border-theme pb-4">
           <div className="text-lg">
-            <span>~/{siteData?.name?.toLowerCase() || "user"}</span> <span className="text-theme-secondary">$</span>
+            <span>~/{siteData.name?.toLowerCase() || "user"}</span> <span className="text-theme-secondary">$</span>
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
@@ -158,25 +158,28 @@ export default function Home() {
                 glitchIntensity="subtle"
               />
             </div>
-            <div className="flex justify-center">
-              <AsciiArt art={asciiArt} />
-            </div>
+            {!asciiError && asciiArt && (
+              <div className="flex justify-center">
+                <AsciiArt art={asciiArt} />
+              </div>
+            )}
+            {asciiError && <div className="text-center text-red-400 p-4">Error loading ASCII art</div>}
             <div className="mt-4 border-t border-theme pt-4">
               <p className="text-theme-secondary mb-2">$ whoami</p>
-              <p className="text-sm">{siteData?.tagline || ""}</p>
+              <p className="text-sm">{siteData.tagline || ""}</p>
             </div>
           </InteractiveSection>
 
           <section id="about" className="mb-16">
             <div className="border-b border-theme mb-4 pb-2 flex items-center">
               <h2 className="text-xl">
-                <span className="text-theme-secondary">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
+                <span className="text-theme-secondary">~/{siteData.name?.toLowerCase() || "user"}</span>{" "}
                 <span>$ cat</span> <span className="text-theme-secondary">about.txt</span>
               </h2>
             </div>
             <div className="grid md:grid-cols-2 gap-8">
               <div>
-                {(siteData?.about || []).map((paragraph, index) => (
+                {(siteData.about || []).map((paragraph, index) => (
                   <p key={index} className="mb-4 text-sm">
                     {paragraph}
                   </p>
@@ -186,7 +189,7 @@ export default function Home() {
                 <div className="border border-theme p-4">
                   <h3 className="text-theme-secondary mb-2 text-sm">$ ls favorite_films/</h3>
                   <ul className="space-y-1 text-xs">
-                    {(siteData?.favoriteFilms || []).map((film, index) => (
+                    {(siteData.favoriteFilms || []).map((film, index) => (
                       <li key={index}>
                         {film.title}
                         {film.director && <span className="text-theme-muted"> // {film.director}</span>}
@@ -197,7 +200,7 @@ export default function Home() {
                 <div className="border border-theme p-4">
                   <h3 className="text-theme-secondary mb-2 text-sm">$ ls interests/</h3>
                   <ul className="space-y-1 text-xs">
-                    {(siteData?.interests || []).map((interest, index) => (
+                    {(siteData.interests || []).map((interest, index) => (
                       <li key={index}>{interest}</li>
                     ))}
                   </ul>
@@ -209,12 +212,12 @@ export default function Home() {
           <section id="projects" className="mb-16">
             <div className="border-b border-theme mb-4 pb-2 flex items-center">
               <h2 className="text-xl">
-                <span className="text-theme-secondary">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
+                <span className="text-theme-secondary">~/{siteData.name?.toLowerCase() || "user"}</span>{" "}
                 <span>$ ls -la</span> <span className="text-theme-secondary">projects/</span>
               </h2>
             </div>
             <div className="space-y-4">
-              {(siteData?.projects || []).map((project) => (
+              {(siteData.projects || []).map((project) => (
                 <div key={project.id} className="border border-theme">
                   <div className="border-b border-theme bg-gray-300/20 dark:bg-green-900/20 p-2 flex justify-between items-center">
                     <h3 className="text-theme-secondary">
@@ -262,12 +265,12 @@ export default function Home() {
           <section id="work" className="mb-16">
             <div className="border-b border-theme mb-4 pb-2 flex items-center">
               <h2 className="text-xl">
-                <span className="text-theme-secondary">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
+                <span className="text-theme-secondary">~/{siteData.name?.toLowerCase() || "user"}</span>{" "}
                 <span>$ cat</span> <span className="text-theme-secondary">work_history.log</span>
               </h2>
             </div>
             <div className="space-y-4">
-              {(siteData?.workExperience || []).map((work, index) => (
+              {(siteData.workExperience || []).map((work, index) => (
                 <div key={index} className="border-l-2 border-theme pl-4">
                   <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
                     <h3 className="text-theme-secondary">{work.title}</h3>
@@ -293,12 +296,12 @@ export default function Home() {
           <section id="writings" className="mb-16">
             <div className="border-b border-theme mb-4 pb-2 flex items-center">
               <h2 className="text-xl">
-                <span className="text-theme-secondary">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
+                <span className="text-theme-secondary">~/{siteData.name?.toLowerCase() || "user"}</span>{" "}
                 <span>$ ls -la</span> <span className="text-theme-secondary">writings/</span>
               </h2>
             </div>
             <div className="space-y-4">
-              {(siteData?.blogPosts || []).map((post) => (
+              {(siteData.blogPosts || []).map((post) => (
                 <div key={post.slug} className="border border-theme p-4">
                   <div className="text-xs mb-2">{post.date}</div>
                   <h3 className="text-theme-secondary mb-2">
@@ -330,7 +333,7 @@ export default function Home() {
           <section id="contact" className="mb-16">
             <div className="border-b border-theme mb-4 pb-2 flex items-center">
               <h2 className="text-xl">
-                <span className="text-theme-secondary">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
+                <span className="text-theme-secondary">~/{siteData.name?.toLowerCase() || "user"}</span>{" "}
                 <span>$ ./contact</span>
               </h2>
             </div>
@@ -340,15 +343,20 @@ export default function Home() {
                 of electric sheep.
               </p>
               <div className="text-sm">
+                {siteData.location && (
+                  <p className="mb-2">
+                    <span className="text-theme-secondary">$ location</span> {siteData.location}
+                  </p>
+                )}
                 <p>
                   Find me on social media or send me an email at{" "}
                   <a
-                    href={siteData?.socialLinks?.email || "mailto:me@nimara.xyz"}
+                    href={siteData.socialLinks?.email || "mailto:me@nimara.xyz"}
                     className="text-theme-secondary hover:underline"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    me@nimara.xyz
+                    {siteData.socialLinks?.email?.replace("mailto:", "") || "me@nimara.xyz"}
                   </a>
                 </p>
               </div>
@@ -359,11 +367,11 @@ export default function Home() {
         <footer className="border-t border-theme py-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0 text-xs">
-              <span className="text-theme-secondary">~/{siteData?.name?.toLowerCase() || "user"}</span>{" "}
+              <span className="text-theme-secondary">~/{siteData.name?.toLowerCase() || "user"}</span>{" "}
               <span>$ echo</span> <span className="text-theme-secondary">"© {new Date().getFullYear()}"</span>
             </div>
             <div className="flex gap-6">
-              {siteData?.socialLinks?.github && (
+              {siteData.socialLinks?.github && (
                 <a
                   href={siteData.socialLinks.github}
                   className="text-theme-primary hover:text-theme-secondary transition-colors"
@@ -373,7 +381,7 @@ export default function Home() {
                   <Github className="h-4 w-4" />
                 </a>
               )}
-              {siteData?.socialLinks?.twitter && (
+              {siteData.socialLinks?.twitter && (
                 <a
                   href={siteData.socialLinks.twitter}
                   className="text-theme-primary hover:text-theme-secondary transition-colors"
@@ -383,7 +391,7 @@ export default function Home() {
                   <X className="h-4 w-4" />
                 </a>
               )}
-              {siteData?.socialLinks?.linkedin && (
+              {siteData.socialLinks?.linkedin && (
                 <a
                   href={siteData.socialLinks.linkedin}
                   className="text-theme-primary hover:text-theme-secondary transition-colors"
@@ -393,7 +401,7 @@ export default function Home() {
                   <Linkedin className="h-4 w-4" />
                 </a>
               )}
-              {siteData?.socialLinks?.email && (
+              {siteData.socialLinks?.email && (
                 <a
                   href={siteData.socialLinks.email}
                   className="text-theme-primary hover:text-theme-secondary transition-colors"
@@ -403,7 +411,7 @@ export default function Home() {
                   <Mail className="h-4 w-4" />
                 </a>
               )}
-              {siteData?.socialLinks?.letterboxd && (
+              {siteData.socialLinks?.letterboxd && (
                 <a
                   href={siteData.socialLinks.letterboxd}
                   className="text-theme-primary hover:text-theme-secondary transition-colors"
@@ -413,7 +421,7 @@ export default function Home() {
                   <Film className="h-4 w-4" />
                 </a>
               )}
-              {siteData?.socialLinks?.telegram && (
+              {siteData.socialLinks?.telegram && (
                 <a
                   href={siteData.socialLinks.telegram}
                   className="text-theme-primary hover:text-theme-secondary transition-colors"
