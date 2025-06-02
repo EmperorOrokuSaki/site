@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 async function fetchLiquityHTML() {
   try {
     const response = await fetch(
-      "https://fmja5vvgx5vfveeb.public.blob.vercel-storage.com/liquity-Zl6KkvD4y8NpWeOqlGxM2tuwUpzypH.html",
+      "https://fmja5vvgx5vfveeb.public.blob.vercel-storage.com/index-vxSlLwSVadcs5yexMuUr8BdpEG0Zx0.html",
       {
         cache: "no-store",
       },
