@@ -11,7 +11,10 @@ const config = {
 			strict: true
 		}),
 		prerender: {
-			handleHttpError: 'warn'
+			handleHttpError: 'warn',
+			handleMissingId: 'warn',
+			handleEntryGeneratorMismatch: 'warn',
+			handleUnseenRoutes: 'warn'
 		}
 	}
 };
