@@ -29,7 +29,10 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          BASE_PATH: /pr-${{ github.event.number }}
+          BASE_PATH: /site/pr-${{ github.event.number }}
+
+      - name: Remove CNAME for preview
+        run: rm -f ./build/CNAME
 
       - name: Deploy preview
         uses: peaceiris/actions-gh-pages@v4
