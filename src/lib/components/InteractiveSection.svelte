@@ -30,17 +30,15 @@
 
 	let container: HTMLDivElement;
 	let particleCanvas: HTMLCanvasElement;
-	let cursorCanvas: HTMLCanvasElement;
 	let isHovering = $state(false);
 
 	onMount(() => {
-		if (!container || !particleCanvas || !cursorCanvas) return;
+		if (!container || !particleCanvas) return;
 
 		const particles: Particle[] = [];
 		let mousePos = { x: 0, y: 0 };
 		let lastEmitTime = 0;
-		let particleAnimationId: number;
-		let cursorAnimationId: number;
+		let animationId: number;
 		const chars =
 			'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/';
 
@@ -48,8 +46,6 @@
 			const rect = container.getBoundingClientRect();
 			particleCanvas.width = rect.width;
 			particleCanvas.height = rect.height;
-			cursorCanvas.width = rect.width;
-			cursorCanvas.height = rect.height;
 		}
 
 		function handleMouseMove(e: MouseEvent) {
@@ -79,7 +75,7 @@
 			}
 		}
 
-		function animateParticles(timestamp: number) {
+		function animate(timestamp: number) {
 			const ctx = particleCanvas.getContext('2d');
 			if (!ctx) return;
 
@@ -108,59 +104,18 @@
 				}
 			}
 
-			particleAnimationId = requestAnimationFrame(animateParticles);
-		}
-
-		function animateCursor() {
-			const ctx = cursorCanvas.getContext('2d');
-			if (!ctx) return;
-
-			ctx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
-
-			if (isHovering) {
-				const asciiColor =
-					getComputedStyle(document.documentElement).getPropertyValue('--ascii-color').trim() ||
-					'#4ade80';
-
-				ctx.beginPath();
-				ctx.arc(mousePos.x, mousePos.y, 12, 0, Math.PI * 2);
-				ctx.strokeStyle = asciiColor;
-				ctx.lineWidth = 1.5;
-				ctx.stroke();
-
-				ctx.beginPath();
-				ctx.arc(mousePos.x, mousePos.y, 3, 0, Math.PI * 2);
-				ctx.fillStyle = asciiColor;
-				ctx.fill();
-
-				ctx.beginPath();
-				ctx.moveTo(mousePos.x - 18, mousePos.y);
-				ctx.lineTo(mousePos.x - 8, mousePos.y);
-				ctx.moveTo(mousePos.x + 8, mousePos.y);
-				ctx.lineTo(mousePos.x + 18, mousePos.y);
-				ctx.moveTo(mousePos.x, mousePos.y - 18);
-				ctx.lineTo(mousePos.x, mousePos.y - 8);
-				ctx.moveTo(mousePos.x, mousePos.y + 8);
-				ctx.lineTo(mousePos.x, mousePos.y + 18);
-				ctx.strokeStyle = asciiColor;
-				ctx.lineWidth = 1;
-				ctx.stroke();
-			}
-
-			cursorAnimationId = requestAnimationFrame(animateCursor);
+			animationId = requestAnimationFrame(animate);
 		}
 
 		updateCanvasSize();
 		window.addEventListener('resize', updateCanvasSize);
 		container.addEventListener('mousemove', handleMouseMove);
-		particleAnimationId = requestAnimationFrame(animateParticles);
-		cursorAnimationId = requestAnimationFrame(animateCursor);
+		animationId = requestAnimationFrame(animate);
 
 		return () => {
 			window.removeEventListener('resize', updateCanvasSize);
 			container.removeEventListener('mousemove', handleMouseMove);
-			cancelAnimationFrame(particleAnimationId);
-			cancelAnimationFrame(cursorAnimationId);
+			cancelAnimationFrame(animationId);
 		};
 	});
 </script>
@@ -183,10 +138,5 @@
 		bind:this={particleCanvas}
 		class="absolute top-0 left-0 w-full h-full pointer-events-none"
 		style="z-index: 1;"
-	></canvas>
-	<canvas
-		bind:this={cursorCanvas}
-		class="absolute top-0 left-0 w-full h-full pointer-events-none"
-		style="z-index: 2;"
 	></canvas>
 </div>
