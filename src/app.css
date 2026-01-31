@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--text-primary: #4ade80;
+	--text-secondary: #86efac;
+	--text-muted: #22c55e;
+	--border-color: #15803d;
+	--hover-bg: #15803d;
+	--hover-text: #000000;
+	--ascii-color: #22c55e;
+	--page-bg: #000000;
+}
+
+.light {
+	--text-primary: #1e1e20;
+	--text-secondary: #324fcf;
+	--text-muted: #9aa1ab;
+	--border-color: #d0d6dd;
+	--hover-bg: #324fcf;
+	--hover-text: #ffffff;
+	--ascii-color: #3e86ff;
+	--page-bg: #fbfbfd;
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+body {
+	background-color: var(--page-bg);
+	font-family: 'Courier New', Courier, monospace;
+	color: var(--text-primary);
+}
+
+.border-theme {
+	border-color: var(--border-color);
+}
+
+.text-theme-primary {
+	color: var(--text-primary);
+}
+
+.text-theme-secondary {
+	color: var(--text-secondary);
+}
+
+.text-theme-muted {
+	color: var(--text-muted);
+}
+
+a:hover {
+	color: var(--text-secondary);
+}
+
+input,
+textarea {
+	border-color: var(--border-color);
+}
+
+.light input,
+.light textarea {
+	@apply bg-gray-100;
+	color: var(--text-primary);
+}
+
+.dark input,
+.dark textarea {
+	@apply bg-black;
+	color: var(--text-primary);
+}
+
+input:focus,
+textarea:focus {
+	@apply outline-none;
+	border-color: var(--text-secondary);
+}
+
+pre {
+	font-family: 'Courier New', Courier, monospace;
+	line-height: 1;
+}
+
+.ascii-art-container pre {
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+::selection {
+	background-color: var(--hover-bg);
+	color: var(--hover-text);
+}
+
+/* Code block styling */
+.prose pre {
+	@apply border border-theme rounded-none my-4 overflow-x-auto;
+	background-color: var(--page-bg) !important;
+}
+
+.prose pre code {
+	font-size: 0.875rem;
+	line-height: 1.5;
+}
+
+.prose code {
+	@apply px-1 py-0.5 rounded-sm;
+	background-color: var(--border-color);
+	color: var(--text-secondary);
+}
+
+.prose pre code {
+	background-color: transparent;
+	padding: 0;
+}
+
+/* Shiki dual theme support */
+.shiki,
+.shiki span {
+	color: var(--shiki-light) !important;
+	background-color: transparent !important;
+}
+
+.dark .shiki,
+.dark .shiki span {
+	color: var(--shiki-dark) !important;
+	background-color: transparent !important;
+}
+
+/* Table of contents styling */
+.toc {
+	@apply border border-theme p-4 mb-8;
+}
+
+.toc ul {
+	@apply space-y-2 text-sm;
+}
+
+.toc a {
+	color: var(--text-muted);
+}
+
+.toc a:hover {
+	color: var(--text-secondary);
+}
+
+/* Prose styling for blog posts */
+.prose {
+	@apply max-w-none;
+}
+
+.prose h1 {
+	@apply text-xl mt-8 mb-4;
+	color: var(--text-secondary);
+}
+
+.prose h2 {
+	@apply text-lg mt-6 mb-3;
+	color: var(--text-secondary);
+}
+
+.prose h3 {
+	@apply text-base mt-4 mb-2;
+	color: var(--text-secondary);
+}
+
+.prose p {
+	@apply my-4 text-sm leading-relaxed;
+}
+
+.prose ul,
+.prose ol {
+	@apply my-4 pl-6 text-sm;
+}
+
+.prose ul {
+	@apply list-disc;
+}
+
+.prose ol {
+	@apply list-decimal;
+}
+
+.prose li {
+	@apply my-1;
+}
+
+.prose a {
+	color: var(--text-secondary);
+	@apply underline;
+}
+
+.prose blockquote {
+	@apply border-l-2 pl-4 my-4 italic;
+	border-color: var(--border-color);
+	color: var(--text-muted);
+}
+
+.prose img {
+	@apply my-6 border border-theme;
+}
+
+.prose hr {
+	@apply my-8;
+	border-color: var(--border-color);
+}
+
+.prose strong {
+	color: var(--text-secondary);
+}
