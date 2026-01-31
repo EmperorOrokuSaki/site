@@ -2,11 +2,12 @@
 	import { Sun, Moon } from 'lucide-svelte';
 	import { browser } from '$app/environment';
 
-	let isDark = $state(true);
+	let isDark = $state(false);
 
 	$effect(() => {
 		if (browser) {
-			isDark = document.documentElement.classList.contains('dark');
+			const savedTheme = localStorage.getItem('theme') || 'light';
+			isDark = savedTheme === 'dark';
 		}
 	});
 
