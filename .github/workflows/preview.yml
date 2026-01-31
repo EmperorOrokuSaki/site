@@ -30,6 +30,7 @@ jobs:
         run: npm run build
         env:
           BASE_PATH: /pr-${{ github.event.number }}
+          COMMIT_SHA: ${{ github.sha }}
 
       - name: Deploy preview
         uses: peaceiris/actions-gh-pages@v4

@@ -9,6 +9,8 @@
 	} from '$lib/components';
 	import { siteData } from '$lib/data/site';
 
+	declare const __COMMIT_HASH__: string;
+
 	interface Props {
 		data: {
 			asciiArt: string;
@@ -256,6 +258,7 @@
 					<span class="text-theme-secondary">~/{siteData.name.toLowerCase()}</span>
 					<span>$ echo</span>
 					<span class="text-theme-secondary">"© {new Date().getFullYear()}"</span>
+					<span class="text-theme-muted ml-2">({__COMMIT_HASH__.slice(0, 7)})</span>
 				</div>
 				<div class="flex gap-6">
 					{#if siteData.socialLinks.github}
