@@ -89,8 +89,15 @@ CSS custom properties in `app.css`:
 - `--theme-bg`, `--theme-text`, etc.
 - Dark/light mode via `class="dark"` on html element
 
+## Git Workflow
+
+- **Never push directly to main** - always create a feature branch and PR
+- Branch naming: `feat/description`, `fix/description`, `docs/description`
+- One feature per PR
+
 ## Don'ts
 
+- Don't push to main directly
 - Don't add unnecessary abstractions
 - Don't create files unless absolutely needed
 - Don't over-engineer solutions
