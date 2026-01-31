@@ -13,7 +13,7 @@
 	// Initialize theme from localStorage on mount
 	$effect(() => {
 		if (browser) {
-			const savedTheme = localStorage.getItem('theme') || 'dark';
+			const savedTheme = localStorage.getItem('theme') || 'light';
 			document.documentElement.classList.toggle('dark', savedTheme === 'dark');
 			document.documentElement.classList.toggle('light', savedTheme === 'light');
 		}

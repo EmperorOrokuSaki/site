@@ -9,6 +9,8 @@
 	} from '$lib/components';
 	import { siteData } from '$lib/data/site';
 
+	declare const __COMMIT_HASH__: string;
+
 	interface Props {
 		data: {
 			asciiArt: string;
@@ -33,15 +35,15 @@
 						>./about</a
 					>
 					<a
+						href="#writings"
+						class="text-theme-primary hover:text-theme-secondary transition-colors">./writings</a
+					>
+					<a
 						href="#projects"
 						class="text-theme-primary hover:text-theme-secondary transition-colors">./projects</a
 					>
 					<a href="#work" class="text-theme-primary hover:text-theme-secondary transition-colors"
 						>./work</a
-					>
-					<a
-						href="#writings"
-						class="text-theme-primary hover:text-theme-secondary transition-colors">./writings</a
 					>
 				</nav>
 			</div>
@@ -102,6 +104,40 @@
 							</ul>
 						</div>
 					</div>
+				</div>
+			</section>
+
+			<section id="writings" class="mb-16">
+				<div class="border-b border-theme mb-4 pb-2 flex items-center">
+					<h2 class="text-xl">
+						<span class="text-theme-secondary">~/{siteData.name.toLowerCase()}</span>
+						<span>$ ls -la</span>
+						<span class="text-theme-secondary">writings/</span>
+					</h2>
+				</div>
+				<div class="space-y-4">
+					{#each data.posts as post}
+						<div class="border border-theme p-4">
+							<div class="text-xs mb-2">{post.date}</div>
+							<h3 class="text-theme-secondary mb-2">
+								<a href="/writings/{post.slug}" class="hover:underline">{post.title}</a>
+							</h3>
+							<p class="text-xs mb-4">{post.excerpt}</p>
+							<div class="flex flex-wrap gap-2">
+								{#each post.tags as tag}
+									<span class="border border-theme px-2 py-1 text-xs">{tag}</span>
+								{/each}
+							</div>
+						</div>
+					{/each}
+				</div>
+				<div class="mt-4 text-center">
+					<a
+						href="/writings"
+						class="inline-block border border-theme px-4 py-2 hover:bg-gray-400 hover:text-gray-900 dark:hover:bg-green-700 dark:hover:text-black transition-colors"
+					>
+						ls --all
+					</a>
 				</div>
 			</section>
 
@@ -187,40 +223,6 @@
 				</div>
 			</section>
 
-			<section id="writings" class="mb-16">
-				<div class="border-b border-theme mb-4 pb-2 flex items-center">
-					<h2 class="text-xl">
-						<span class="text-theme-secondary">~/{siteData.name.toLowerCase()}</span>
-						<span>$ ls -la</span>
-						<span class="text-theme-secondary">writings/</span>
-					</h2>
-				</div>
-				<div class="space-y-4">
-					{#each data.posts as post}
-						<div class="border border-theme p-4">
-							<div class="text-xs mb-2">{post.date}</div>
-							<h3 class="text-theme-secondary mb-2">
-								<a href="/writings/{post.slug}" class="hover:underline">{post.title}</a>
-							</h3>
-							<p class="text-xs mb-4">{post.excerpt}</p>
-							<div class="flex flex-wrap gap-2">
-								{#each post.tags as tag}
-									<span class="border border-theme px-2 py-1 text-xs">{tag}</span>
-								{/each}
-							</div>
-						</div>
-					{/each}
-				</div>
-				<div class="mt-4 text-center">
-					<a
-						href="/writings"
-						class="inline-block border border-theme px-4 py-2 hover:bg-gray-400 hover:text-gray-900 dark:hover:bg-green-700 dark:hover:text-black transition-colors"
-					>
-						ls --all
-					</a>
-				</div>
-			</section>
-
 			<section id="contact" class="mb-16">
 				<div class="border-b border-theme mb-4 pb-2 flex items-center">
 					<h2 class="text-xl">
@@ -256,6 +258,7 @@
 					<span class="text-theme-secondary">~/{siteData.name.toLowerCase()}</span>
 					<span>$ echo</span>
 					<span class="text-theme-secondary">"© {new Date().getFullYear()}"</span>
+					<span class="text-theme-muted ml-2">({__COMMIT_HASH__.slice(0, 7)})</span>
 				</div>
 				<div class="flex gap-6">
 					{#if siteData.socialLinks.github}
