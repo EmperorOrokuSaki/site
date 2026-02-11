@@ -2,7 +2,7 @@
 	import { browser } from '$app/environment';
 
 	const SPEED_THRESHOLD = 1120;
-	const COLORS = ['#ff2244', '#ff6622', '#ffcc11', '#22ff66', '#22ccff', '#cc44ff'];
+	const COLORS = ['#ff2233', '#ff6622', '#ffaa11', '#ffcc22', '#44dd33'];
 	const FADE_DURATION = 800;
 	const MIN_DISTANCE = 3;
 	const STRIP_SPACING = 1.5;
