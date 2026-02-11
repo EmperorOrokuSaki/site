@@ -116,7 +116,7 @@
 </script>
 
 <div
-	class="flex justify-center relative"
+	class="flex justify-center relative overflow-hidden"
 	bind:this={container}
 	onmouseenter={() => (isHovering = true)}
 	onmouseleave={() => (isHovering = false)}
@@ -124,7 +124,7 @@
 	aria-label="ASCII art"
 >
 	<pre
-		class="whitespace-pre overflow-x-auto max-h-[400px]"
+		class="whitespace-pre max-h-[400px]"
 		style="font-size: 4px; line-height: 1; contain: content; transform: translateZ(0); color: var(--ascii-color); user-select: none;"
 		>{isRendered ? art : 'Loading ASCII art...'}</pre>
 	<canvas bind:this={canvas} class="absolute pointer-events-none" style="z-index: 1;"></canvas>
