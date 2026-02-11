@@ -29,10 +29,8 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          BASE_PATH: /site/pr-${{ github.event.number }}
-
-      - name: Remove CNAME for preview
-        run: rm -f ./build/CNAME
+          BASE_PATH: /pr-${{ github.event.number }}
+          COMMIT_SHA: ${{ github.sha }}
 
       - name: Deploy preview
         uses: peaceiris/actions-gh-pages@v4
@@ -45,7 +43,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const url = `https://${context.repo.owner}.github.io/${context.repo.repo}/pr-${context.issue.number}/`;
+            const url = `https://tmp.nimara.xyz/pr-${context.issue.number}/`;
             const body = `🚀 Preview deployed to: ${url}`;
 
             // Check if comment already exists
