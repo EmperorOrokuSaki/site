@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 
-	const SPEED_THRESHOLD = 800;
-	const COLORS = ['#ff3333', '#33ff33', '#ffff33'];
-	const FADE_DURATION = 600;
-	const MIN_DISTANCE = 4;
-	const STRIP_OFFSET = 4;
-	const MAX_WIDTH = 3;
+	const SPEED_THRESHOLD = 1120;
+	const COLORS = ['#ff2244', '#ff6622', '#ffcc11', '#22ff66', '#22ccff', '#cc44ff'];
+	const FADE_DURATION = 800;
+	const MIN_DISTANCE = 3;
+	const STRIP_SPACING = 3;
+	const MAX_WIDTH = 3.5;
+	const MIN_WIDTH = 0.2;
 
 	let canvas: HTMLCanvasElement;
 
@@ -25,7 +26,6 @@
 	let animFrame = 0;
 
 	function onMouseMove(e: MouseEvent) {
-		// Skip when inside the interactive section (ASCII art area)
 		const target = e.target as HTMLElement;
 		if (target?.closest('[data-no-trail]')) return;
 
@@ -39,10 +39,8 @@
 			const speed = (dist / dt) * 1000;
 
 			if (speed > SPEED_THRESHOLD && dist > MIN_DISTANCE) {
-				// Normal perpendicular to movement direction
 				const nx = -dy / dist;
 				const ny = dx / dist;
-
 				points.push({ x: e.clientX, y: e.clientY, nx, ny, time: now });
 			}
 		}
@@ -68,46 +66,40 @@
 		}
 
 		const len = points.length;
+		const halfColors = (COLORS.length - 1) / 2;
 
-		for (let c = 0; c < COLORS.length; c++) {
-			const offset = (c - 1) * STRIP_OFFSET;
+		// Draw each segment individually so width and alpha can vary
+		for (let i = 1; i < len; i++) {
+			const prev = points[i - 1];
+			const curr = points[i];
 
-			ctx.beginPath();
-			ctx.strokeStyle = COLORS[c];
-			ctx.lineCap = 'round';
-			ctx.lineJoin = 'round';
+			if (curr.time - prev.time > 50) continue;
 
-			let started = false;
+			// Progress: 0 at tail, 1 at head
+			const progress = i / (len - 1);
+			const age = now - curr.time;
+			const fade = 1 - age / FADE_DURATION;
+			// Ease out the fade for smoother disappearance
+			const alpha = fade * fade * progress;
+			const width = MIN_WIDTH + progress * progress * (MAX_WIDTH - MIN_WIDTH);
 
-			for (let i = 0; i < len; i++) {
-				const p = points[i];
+			for (let c = 0; c < COLORS.length; c++) {
+				const offset = (c - halfColors) * STRIP_SPACING;
 
-				if (i > 0 && p.time - points[i - 1].time > 50) {
-					// Gap in trail — start a new sub-path
-					started = false;
-					continue;
-				}
+				const x1 = prev.x + prev.nx * offset;
+				const y1 = prev.y + prev.ny * offset;
+				const x2 = curr.x + curr.nx * offset;
+				const y2 = curr.y + curr.ny * offset;
 
-				const ox = p.x + p.nx * offset;
-				const oy = p.y + p.ny * offset;
-
-				// Thinning: older points are thinner
-				const progress = i / (len - 1);
-				const age = now - p.time;
-				const alpha = 1 - age / FADE_DURATION;
-
+				ctx.beginPath();
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.strokeStyle = COLORS[c];
 				ctx.globalAlpha = Math.max(0, alpha);
-				ctx.lineWidth = Math.max(0.5, progress * MAX_WIDTH);
-
-				if (!started) {
-					ctx.moveTo(ox, oy);
-					started = true;
-				} else {
-					ctx.lineTo(ox, oy);
-				}
+				ctx.lineWidth = width;
+				ctx.lineCap = 'round';
+				ctx.stroke();
 			}
-
-			ctx.stroke();
 		}
 
 		ctx.globalAlpha = 1;
