@@ -124,6 +124,7 @@
 	class="relative {className}"
 	bind:this={container}
 	style="cursor: none;"
+	data-no-trail
 	onmouseenter={() => (isHovering = true)}
 	onmouseleave={() => (isHovering = false)}
 	role="region"

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import '../app.css';
+	import { CursorTrail } from '$lib/components';
 
 	import type { Snippet } from 'svelte';
 
@@ -24,4 +25,5 @@
 	<title>Nima Rasooli - Home</title>
 </svelte:head>
 
+<CursorTrail />
 {@render children()}

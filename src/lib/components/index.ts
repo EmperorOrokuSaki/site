@@ -1,3 +1,4 @@
+export { default as CursorTrail } from './CursorTrail.svelte';
 export { default as ThemeToggle } from './ThemeToggle.svelte';
 export { default as GlitchText } from './GlitchText.svelte';
 export { default as AsciiArt } from './AsciiArt.svelte';
