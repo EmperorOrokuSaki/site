@@ -69,9 +69,16 @@ export const siteData = {
 	] as Project[],
 	workExperience: [
 		{
+			title: 'Founder',
+			company: 'Mirage',
+			period: '2025 - Present',
+			description: 'Making stablecoin privacy accessible and scalable.',
+			tags: ['rust', 'blockchain', 'privacy']
+		},
+		{
 			title: 'EIR',
 			company: 'Code & State',
-			period: '2025 - Present',
+			period: '2025',
 			description: 'Building a probabilistic privacy solution for Ethereum.',
 			tags: ['rust', 'blockchain', 'infra']
 		},
@@ -85,7 +92,7 @@ export const siteData = {
 		{
 			title: 'Security Researcher',
 			company: 'Solidstate (Contractor)',
-			period: '2023 - Present',
+			period: '2023 - 2025',
 			description: 'Auditing smart contracts.',
 			tags: ['security', 'rust']
 		},
