@@ -126,6 +126,6 @@
 	<pre
 		class="whitespace-pre max-h-[400px]"
 		style="font-size: 4px; line-height: 1; contain: content; transform: translateZ(0); color: var(--ascii-color); user-select: none;"
-		>{isRendered ? art : 'Loading ASCII art...'}</pre>
+		>{isRendered ? art : ''}</pre>
 	<canvas bind:this={canvas} class="absolute pointer-events-none" style="z-index: 1;"></canvas>
 </div>
