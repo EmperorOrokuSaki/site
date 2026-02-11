@@ -92,7 +92,7 @@ export const siteData = {
 		{
 			title: 'Security Researcher',
 			company: 'Solidstate (Contractor)',
-			period: '2023 - Present',
+			period: '2023 - 2025',
 			description: 'Auditing smart contracts.',
 			tags: ['security', 'rust']
 		},
