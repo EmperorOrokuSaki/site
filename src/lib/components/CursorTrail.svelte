@@ -5,9 +5,9 @@
 	const COLORS = ['#ff2244', '#ff6622', '#ffcc11', '#22ff66', '#22ccff', '#cc44ff'];
 	const FADE_DURATION = 800;
 	const MIN_DISTANCE = 3;
-	const STRIP_SPACING = 3;
-	const MAX_WIDTH = 3.5;
-	const MIN_WIDTH = 0.2;
+	const STRIP_SPACING = 1.5;
+	const MAX_WIDTH = 1.5;
+	const MIN_WIDTH = 0.1;
 
 	let canvas: HTMLCanvasElement;
 
