@@ -21,7 +21,7 @@
 </script>
 
 <svelte:head>
-	<title>Nima - Rust Developer</title>
+	<title>Nima Rasooli - Home</title>
 </svelte:head>
 
 {@render children()}
