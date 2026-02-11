@@ -101,7 +101,7 @@ export const siteData = {
 		github: 'https://github.com/EmperorOrokuSaki',
 		twitter: 'https://twitter.com/0xNimaRa',
 		linkedin: 'https://www.linkedin.com/in/nima-rasooli/',
-		email: 'mailto:me@nimra.xyz',
+		email: 'mailto:me@nimara.xyz',
 		letterboxd: 'https://letterboxd.com/nimara/',
 		telegram: 'https://t.me/Emperororokusaki'
 	} as SocialLinks
