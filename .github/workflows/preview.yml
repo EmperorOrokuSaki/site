@@ -43,7 +43,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const url = `https://tmp.nimara.xyz/pr-${context.issue.number}/`;
+            const url = `https://nimara.xyz/pr-${context.issue.number}/`;
             const body = `🚀 Preview deployed to: ${url}`;
 
             // Check if comment already exists

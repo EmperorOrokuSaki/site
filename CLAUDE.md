@@ -4,7 +4,7 @@
 
 Personal website for Nima Rasooli - a Rust developer's portfolio with terminal/hacker aesthetic. Built with SvelteKit, hosted on GitHub Pages.
 
-**Live site:** https://tmp.nimara.xyz (will migrate to nimara.xyz)
+**Live site:** https://nimara.xyz
 
 ## Tech Stack
 
