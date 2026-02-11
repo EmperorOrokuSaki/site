@@ -2,16 +2,19 @@
 	import { browser } from '$app/environment';
 
 	const SPEED_THRESHOLD = 800;
-	const TRAIL_COLORS = ['#ff3333', '#33ff33', '#ffff33'];
+	const COLORS = ['#ff3333', '#33ff33', '#ffff33'];
 	const FADE_DURATION = 600;
 	const MIN_DISTANCE = 4;
+	const STRIP_OFFSET = 4;
+	const MAX_WIDTH = 3;
 
 	let canvas: HTMLCanvasElement;
 
 	interface Point {
 		x: number;
 		y: number;
-		color: string;
+		nx: number;
+		ny: number;
 		time: number;
 	}
 
@@ -19,10 +22,13 @@
 	let lastX = 0;
 	let lastY = 0;
 	let lastTime = 0;
-	let colorIndex = 0;
 	let animFrame = 0;
 
 	function onMouseMove(e: MouseEvent) {
+		// Skip when inside the interactive section (ASCII art area)
+		const target = e.target as HTMLElement;
+		if (target?.closest('[data-no-trail]')) return;
+
 		const now = performance.now();
 		const dt = now - lastTime;
 
@@ -33,13 +39,11 @@
 			const speed = (dist / dt) * 1000;
 
 			if (speed > SPEED_THRESHOLD && dist > MIN_DISTANCE) {
-				points.push({
-					x: e.clientX,
-					y: e.clientY,
-					color: TRAIL_COLORS[colorIndex % TRAIL_COLORS.length],
-					time: now
-				});
-				colorIndex++;
+				// Normal perpendicular to movement direction
+				const nx = -dy / dist;
+				const ny = dx / dist;
+
+				points.push({ x: e.clientX, y: e.clientY, nx, ny, time: now });
 			}
 		}
 
@@ -58,22 +62,51 @@
 		const now = performance.now();
 		points = points.filter((p) => now - p.time < FADE_DURATION);
 
-		for (let i = 1; i < points.length; i++) {
-			const prev = points[i - 1];
-			const curr = points[i];
+		if (points.length < 2) {
+			animFrame = requestAnimationFrame(draw);
+			return;
+		}
 
-			if (curr.time - prev.time > 50) continue;
+		const len = points.length;
 
-			const age = now - curr.time;
-			const alpha = 1 - age / FADE_DURATION;
+		for (let c = 0; c < COLORS.length; c++) {
+			const offset = (c - 1) * STRIP_OFFSET;
 
 			ctx.beginPath();
-			ctx.moveTo(prev.x, prev.y);
-			ctx.lineTo(curr.x, curr.y);
-			ctx.strokeStyle = curr.color;
-			ctx.globalAlpha = Math.max(0, alpha);
-			ctx.lineWidth = 2;
+			ctx.strokeStyle = COLORS[c];
 			ctx.lineCap = 'round';
+			ctx.lineJoin = 'round';
+
+			let started = false;
+
+			for (let i = 0; i < len; i++) {
+				const p = points[i];
+
+				if (i > 0 && p.time - points[i - 1].time > 50) {
+					// Gap in trail — start a new sub-path
+					started = false;
+					continue;
+				}
+
+				const ox = p.x + p.nx * offset;
+				const oy = p.y + p.ny * offset;
+
+				// Thinning: older points are thinner
+				const progress = i / (len - 1);
+				const age = now - p.time;
+				const alpha = 1 - age / FADE_DURATION;
+
+				ctx.globalAlpha = Math.max(0, alpha);
+				ctx.lineWidth = Math.max(0.5, progress * MAX_WIDTH);
+
+				if (!started) {
+					ctx.moveTo(ox, oy);
+					started = true;
+				} else {
+					ctx.lineTo(ox, oy);
+				}
+			}
+
 			ctx.stroke();
 		}
 
