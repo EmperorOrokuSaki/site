@@ -8,6 +8,7 @@
 	const STRIP_SPACING = 1.5;
 	const MAX_WIDTH = 1.5;
 	const MIN_WIDTH = 0.1;
+	const METEOR_RADIUS = 5;
 
 	let canvas: HTMLCanvasElement;
 
@@ -100,6 +101,23 @@
 				ctx.lineCap = 'round';
 				ctx.stroke();
 			}
+		}
+
+		// Meteor ball at the head
+		const head = points[len - 1];
+		const headAge = now - head.time;
+		const headFade = 1 - headAge / FADE_DURATION;
+		if (headFade > 0) {
+			const glow = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, METEOR_RADIUS);
+			glow.addColorStop(0, '#ffffff');
+			glow.addColorStop(0.3, '#ffcc22');
+			glow.addColorStop(0.7, '#ff6622');
+			glow.addColorStop(1, 'rgba(255, 34, 51, 0)');
+			ctx.globalAlpha = headFade * headFade;
+			ctx.beginPath();
+			ctx.arc(head.x, head.y, METEOR_RADIUS, 0, Math.PI * 2);
+			ctx.fillStyle = glow;
+			ctx.fill();
 		}
 
 		ctx.globalAlpha = 1;
