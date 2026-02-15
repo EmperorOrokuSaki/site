@@ -1,0 +1,1 @@
+import{k as o,b as u,H as _,l as t,C as g,m as a,o as i,v as d,w as m,x as p}from"./x51toG28.js";function E(n,r){let s=null,f=t;var l;if(t){s=m;for(var e=p(document.head);e!==null&&(e.nodeType!==g||e.data!==n);)e=a(e);if(e===null)i(!1);else{var y=a(e);e.remove(),d(y)}}t||(l=document.head.appendChild(o()));try{u(()=>r(l),_)}finally{f&&(i(!0),d(s))}}export{E as h};
