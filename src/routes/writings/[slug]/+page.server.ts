@@ -40,7 +40,7 @@ async function getHighlighter() {
 
 export function entries() {
 	try {
-		const postsDir = 'content/posts';
+		const postsDir = 'src/posts';
 		const files = readdirSync(postsDir).filter((f) => f.endsWith('.md'));
 		return files.map((file) => ({ slug: file.replace('.md', '') }));
 	} catch {
@@ -75,7 +75,7 @@ function extractToc(content: string): Array<{ id: string; text: string; level: n
 function getAllPosts(): PostMeta[] {
 	const posts: PostMeta[] = [];
 	try {
-		const postsDir = 'content/posts';
+		const postsDir = 'src/posts';
 		const files = readdirSync(postsDir).filter((f) => f.endsWith('.md'));
 
 		for (const file of files) {
@@ -88,14 +88,22 @@ function getAllPosts(): PostMeta[] {
 
 				const titleMatch = frontmatter.match(/title:\s*["']?(.+?)["']?\s*$/m);
 				const dateMatch = frontmatter.match(/date:\s*["']?(.+?)["']?\s*$/m);
-				const excerptMatch = frontmatter.match(/excerpt:\s*["']?(.+?)["']?\s*$/m);
+				const excerptMatch =
+					frontmatter.match(/excerpt:\s*["']?(.+?)["']?\s*$/m) ||
+					frontmatter.match(/description:\s*["']?(.+?)["']?\s*$/m);
 				const tagsMatch = frontmatter.match(/tags:\s*\[([^\]]*)\]/);
+				const tagMatch = frontmatter.match(/tag:\s*["']?(.+?)["']?\s*$/m);
 
 				if (titleMatch) meta.title = titleMatch[1];
 				if (dateMatch) meta.date = dateMatch[1];
 				if (excerptMatch) meta.excerpt = excerptMatch[1];
 				if (tagsMatch) {
 					meta.tags = tagsMatch[1]
+						.split(',')
+						.map((t) => t.trim().replace(/["']/g, ''))
+						.filter(Boolean);
+				} else if (tagMatch) {
+					meta.tags = tagMatch[1]
 						.split(',')
 						.map((t) => t.trim().replace(/["']/g, ''))
 						.filter(Boolean);
@@ -120,7 +128,7 @@ export async function load({ params }) {
 
 	try {
 		// Read the raw file
-		const rawContent = readFileSync(`content/posts/${slug}.md`, 'utf-8');
+		const rawContent = readFileSync(`src/posts/${slug}.md`, 'utf-8');
 		const frontmatterMatch = rawContent.match(/^---\n([\s\S]*?)\n---/);
 
 		let title = '';
@@ -132,14 +140,22 @@ export async function load({ params }) {
 			const frontmatter = frontmatterMatch[1];
 			const titleMatch = frontmatter.match(/title:\s*["']?(.+?)["']?\s*$/m);
 			const dateMatch = frontmatter.match(/date:\s*["']?(.+?)["']?\s*$/m);
-			const excerptMatch = frontmatter.match(/excerpt:\s*["']?(.+?)["']?\s*$/m);
+			const excerptMatch =
+				frontmatter.match(/excerpt:\s*["']?(.+?)["']?\s*$/m) ||
+				frontmatter.match(/description:\s*["']?(.+?)["']?\s*$/m);
 			const tagsMatch = frontmatter.match(/tags:\s*\[([^\]]*)\]/);
+			const tagMatch = frontmatter.match(/tag:\s*["']?(.+?)["']?\s*$/m);
 
 			if (titleMatch) title = titleMatch[1];
 			if (dateMatch) date = dateMatch[1];
 			if (excerptMatch) excerpt = excerptMatch[1];
 			if (tagsMatch) {
 				tags = tagsMatch[1]
+					.split(',')
+					.map((t) => t.trim().replace(/["']/g, ''))
+					.filter(Boolean);
+			} else if (tagMatch) {
+				tags = tagMatch[1]
 					.split(',')
 					.map((t) => t.trim().replace(/["']/g, ''))
 					.filter(Boolean);

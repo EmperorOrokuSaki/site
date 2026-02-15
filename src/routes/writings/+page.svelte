@@ -18,6 +18,16 @@
 
 	let { data }: Props = $props();
 	const authorName = siteData.name.toLowerCase();
+
+	let selectedTag: string | null = $state(null);
+
+	const allTags = $derived(
+		[...new Set(data.posts.flatMap((p) => p.tags))].sort()
+	);
+
+	const filteredPosts = $derived(
+		selectedTag ? data.posts.filter((p) => p.tags.includes(selectedTag!)) : data.posts
+	);
 </script>
 
 <svelte:head>
@@ -41,13 +51,33 @@
 				</h1>
 			</div>
 
-			{#if data.posts.length === 0}
+			{#if allTags.length > 0}
+				<div class="flex flex-wrap items-center gap-1 sm:gap-2 mb-4 sm:mb-6">
+					<span class="text-xs text-theme-muted">filter --tag=</span>
+					<button
+						class="border px-1.5 py-0.5 sm:px-2 sm:py-1 text-xs transition-colors {selectedTag === null ? 'border-theme bg-[var(--hover-bg)] text-[var(--hover-text)]' : 'border-theme hover:border-gray-500 dark:hover:border-green-500'}"
+						onclick={() => selectedTag = null}
+					>
+						all
+					</button>
+					{#each allTags as tag}
+						<button
+							class="border px-1.5 py-0.5 sm:px-2 sm:py-1 text-xs transition-colors {selectedTag === tag ? 'border-theme bg-[var(--hover-bg)] text-[var(--hover-text)]' : 'border-theme hover:border-gray-500 dark:hover:border-green-500'}"
+							onclick={() => selectedTag = selectedTag === tag ? null : tag}
+						>
+							{tag}
+						</button>
+					{/each}
+				</div>
+			{/if}
+
+			{#if filteredPosts.length === 0}
 				<div class="border border-yellow-600 bg-yellow-900/20 p-3 sm:p-4 text-yellow-400 text-sm sm:text-base">
-					No blog posts found.
+					{data.posts.length === 0 ? 'No blog posts found.' : 'No posts matching this tag.'}
 				</div>
 			{:else}
 				<div class="space-y-4 sm:space-y-6">
-					{#each data.posts as post}
+					{#each filteredPosts as post}
 						<div class="border border-theme p-3 sm:p-4 hover:border-gray-500 dark:hover:border-green-500 transition-colors">
 							<div class="flex items-center justify-between mb-1 sm:mb-2">
 								<div class="text-xs">{post.date}</div>
