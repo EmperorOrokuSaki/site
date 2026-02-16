@@ -32,6 +32,7 @@
 		let isScratching = false;
 		let lastPos = { x: 0, y: 0 };
 		let frameCount = 0;
+		let animationId: number | null = null;
 
 		function updateCanvasSize() {
 			const parent = canvas.parentElement;
@@ -39,6 +40,12 @@
 			const { width, height } = parent.getBoundingClientRect();
 			canvas.width = width;
 			canvas.height = height;
+		}
+
+		function startAnimation() {
+			if (animationId === null) {
+				animationId = requestAnimationFrame(animateLoop);
+			}
 		}
 
 		function revealWordAtPosition(x: number, y: number) {
@@ -60,6 +67,7 @@
 				rgbShift: 0,
 				isGlitching: false
 			});
+			startAnimation();
 		}
 
 		function handleStart(x: number, y: number) {
@@ -178,15 +186,20 @@
 			}
 		}
 
-		let animationId: number;
-		function animate() {
+		function animateLoop() {
 			const ctx = canvas.getContext('2d');
 			if (ctx) {
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
 				frameCount++;
 				drawWords(ctx);
 			}
-			animationId = requestAnimationFrame(animate);
+
+			// Only keep animating if there are active words
+			if (revealedWords.length > 0) {
+				animationId = requestAnimationFrame(animateLoop);
+			} else {
+				animationId = null;
+			}
 		}
 
 		updateCanvasSize();
@@ -198,7 +211,6 @@
 		canvas.addEventListener('touchstart', onTouchStart, { passive: false });
 		canvas.addEventListener('touchmove', onTouchMove, { passive: false });
 		canvas.addEventListener('touchend', handleEnd);
-		animationId = requestAnimationFrame(animate);
 
 		return () => {
 			window.removeEventListener('resize', updateCanvasSize);
@@ -209,7 +221,7 @@
 			canvas.removeEventListener('touchstart', onTouchStart);
 			canvas.removeEventListener('touchmove', onTouchMove);
 			canvas.removeEventListener('touchend', handleEnd);
-			cancelAnimationFrame(animationId);
+			if (animationId !== null) cancelAnimationFrame(animationId);
 		};
 	});
 </script>

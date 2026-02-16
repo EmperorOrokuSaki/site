@@ -31,7 +31,15 @@
 </script>
 
 <svelte:head>
-	<title>Writings - {siteData.name}</title>
+	<title>Writings — Nima Rasooli</title>
+	<meta name="description" content="Articles and notes by Nima Rasooli on Rust, systems programming, blockchain, cinema, and philosophy." />
+	<meta property="og:title" content="Writings — Nima Rasooli" />
+	<meta property="og:description" content="Articles and notes by Nima Rasooli on Rust, systems programming, blockchain, cinema, and philosophy." />
+	<meta property="og:url" content="https://nimara.xyz/writings" />
+	<meta property="og:type" content="website" />
+	<meta name="twitter:title" content="Writings — Nima Rasooli" />
+	<meta name="twitter:description" content="Articles and notes by Nima Rasooli on Rust, systems programming, blockchain, cinema, and philosophy." />
+	<link rel="canonical" href="https://nimara.xyz/writings" />
 </svelte:head>
 
 <div class="min-h-screen p-2 sm:p-4">

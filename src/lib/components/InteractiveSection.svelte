@@ -38,9 +38,10 @@
 		const particles: Particle[] = [];
 		let mousePos = { x: 0, y: 0 };
 		let lastEmitTime = 0;
-		let animationId: number;
+		let animationId: number | null = null;
 		const chars =
 			'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/';
+		let cachedAsciiColor = '';
 
 		function updateCanvasSize() {
 			const rect = container.getBoundingClientRect();
@@ -80,9 +81,12 @@
 			if (!ctx) return;
 
 			ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
-			const asciiColor =
-				getComputedStyle(document.documentElement).getPropertyValue('--ascii-color').trim() ||
-				'#22c55e';
+
+			if (!cachedAsciiColor || timestamp % 1000 < 16) {
+				cachedAsciiColor =
+					getComputedStyle(document.documentElement).getPropertyValue('--ascii-color').trim() ||
+					'#22c55e';
+			}
 
 			emitParticles(timestamp);
 
@@ -94,7 +98,7 @@
 
 				const opacity = 1 - p.life / p.maxLife;
 				ctx.font = `${p.size}px monospace`;
-				ctx.fillStyle = `${asciiColor}${Math.round(opacity * 255)
+				ctx.fillStyle = `${cachedAsciiColor}${Math.round(opacity * 255)
 					.toString(16)
 					.padStart(2, '0')}`;
 				ctx.fillText(p.char, p.x, p.y);
@@ -104,18 +108,28 @@
 				}
 			}
 
-			animationId = requestAnimationFrame(animate);
+			// Only keep animating if there are particles or hovering
+			if (particles.length > 0 || isHovering) {
+				animationId = requestAnimationFrame(animate);
+			} else {
+				animationId = null;
+			}
+		}
+
+		function startAnimation() {
+			if (animationId === null) {
+				animationId = requestAnimationFrame(animate);
+			}
 		}
 
 		updateCanvasSize();
 		window.addEventListener('resize', updateCanvasSize);
 		container.addEventListener('mousemove', handleMouseMove);
-		animationId = requestAnimationFrame(animate);
 
 		return () => {
 			window.removeEventListener('resize', updateCanvasSize);
 			container.removeEventListener('mousemove', handleMouseMove);
-			cancelAnimationFrame(animationId);
+			if (animationId !== null) cancelAnimationFrame(animationId);
 		};
 	});
 </script>
@@ -124,8 +138,8 @@
 	class="relative {className}"
 	bind:this={container}
 	style="cursor: none;"
-	onmouseenter={() => (isHovering = true)}
-	onmouseleave={() => (isHovering = false)}
+	onmouseenter={() => { isHovering = true; }}
+	onmouseleave={() => { isHovering = false; }}
 	role="region"
 >
 	{@render children()}

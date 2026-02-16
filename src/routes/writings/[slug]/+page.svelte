@@ -23,8 +23,41 @@
 </script>
 
 <svelte:head>
-	<title>{data.title} - {siteData.name}</title>
+	<title>{data.title} — Nima Rasooli</title>
 	<meta name="description" content={data.excerpt} />
+	<meta property="og:title" content="{data.title} — Nima Rasooli" />
+	<meta property="og:description" content={data.excerpt} />
+	<meta property="og:url" content="https://nimara.xyz/writings/{data.slug}" />
+	<meta property="og:type" content="article" />
+	<meta property="article:published_time" content={data.date} />
+	<meta property="article:author" content="Nima Rasooli" />
+	{#each data.tags as tag}
+		<meta property="article:tag" content={tag} />
+	{/each}
+	<meta name="twitter:title" content="{data.title} — Nima Rasooli" />
+	<meta name="twitter:description" content={data.excerpt} />
+	<link rel="canonical" href="https://nimara.xyz/writings/{data.slug}" />
+	{@html `<script type="application/ld+json">${JSON.stringify({
+		"@context": "https://schema.org",
+		"@type": "BlogPosting",
+		"headline": data.title,
+		"description": data.excerpt,
+		"datePublished": data.date,
+		"author": {
+			"@type": "Person",
+			"name": "Nima Rasooli",
+			"url": "https://nimara.xyz"
+		},
+		"publisher": {
+			"@type": "Person",
+			"name": "Nima Rasooli"
+		},
+		"mainEntityOfPage": {
+			"@type": "WebPage",
+			"@id": `https://nimara.xyz/writings/${data.slug}`
+		},
+		"keywords": data.tags.join(", ")
+	})}</script>`}
 </svelte:head>
 
 <div class="min-h-screen p-2 sm:p-4">

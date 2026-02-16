@@ -32,6 +32,13 @@ body {
 	background-color: var(--page-bg);
 	font-family: 'Courier New', Courier, monospace;
 	color: var(--text-primary);
+	text-rendering: optimizeSpeed;
+}
+
+/* Below-fold sections: defer rendering until near viewport */
+section[id] {
+	content-visibility: auto;
+	contain-intrinsic-size: auto 500px;
 }
 
 .border-theme {
