@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Github, Linkedin, Mail, Film } from 'lucide-svelte';
+	import { Github, Linkedin, Mail, Film, Menu, X } from 'lucide-svelte';
 	import {
 		ThemeToggle,
 		GlitchText,
@@ -20,6 +20,14 @@
 	}
 
 	let { data }: Props = $props();
+	let mobileMenuOpen = $state(false);
+
+	const navLinks = [
+		{ href: '#about', label: './about' },
+		{ href: '#writings', label: './writings' },
+		{ href: '#projects', label: './projects' },
+		{ href: '#work', label: './work' }
+	];
 </script>
 
 <svelte:head>
@@ -27,6 +35,8 @@
 	<meta name="description" content="Nima Rasooli — Rust programmer, low-level compute enthusiast, and founder of Mirage. Building privacy tools, blockchain infrastructure, and systems software from Berlin." />
 	<link rel="canonical" href="https://nimara.xyz" />
 </svelte:head>
+
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <div class="min-h-screen p-4">
 	<div class="container mx-auto">
@@ -39,25 +49,39 @@
 			<div class="flex items-center gap-4">
 				<ThemeToggle />
 				<nav class="hidden md:flex gap-6" aria-label="Main navigation">
-					<a href="#about" class="text-theme-primary hover:text-theme-secondary transition-colors"
-						>./about</a
-					>
-					<a
-						href="#writings"
-						class="text-theme-primary hover:text-theme-secondary transition-colors">./writings</a
-					>
-					<a
-						href="#projects"
-						class="text-theme-primary hover:text-theme-secondary transition-colors">./projects</a
-					>
-					<a href="#work" class="text-theme-primary hover:text-theme-secondary transition-colors"
-						>./work</a
-					>
+					{#each navLinks as link}
+						<a href={link.href} class="text-theme-primary hover:text-theme-secondary transition-colors">{link.label}</a>
+					{/each}
 				</nav>
+				<button
+					class="md:hidden border border-theme p-2"
+					style="border-color: var(--border-color);"
+					onclick={() => mobileMenuOpen = !mobileMenuOpen}
+					aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+					aria-expanded={mobileMenuOpen}
+				>
+					{#if mobileMenuOpen}
+						<X class="h-4 w-4" />
+					{:else}
+						<Menu class="h-4 w-4" />
+					{/if}
+				</button>
 			</div>
 		</header>
 
-		<main class="py-8">
+		{#if mobileMenuOpen}
+			<nav class="md:hidden border-b border-theme py-3 flex flex-col gap-3" aria-label="Mobile navigation">
+				{#each navLinks as link}
+					<a
+						href={link.href}
+						class="text-theme-primary hover:text-theme-secondary transition-colors text-sm px-2"
+						onclick={() => mobileMenuOpen = false}
+					>{link.label}</a>
+				{/each}
+			</nav>
+		{/if}
+
+		<main id="main-content" class="py-8">
 			<InteractiveSection class="mb-16 border border-theme p-4">
 				{#snippet children()}
 					<div class="text-center mb-4">

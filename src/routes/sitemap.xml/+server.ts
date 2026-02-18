@@ -1,5 +1,4 @@
-import { readdirSync, readFileSync } from 'fs';
-import { join } from 'path';
+import { getAllPosts } from '$lib/server/posts';
 
 const SITE_URL = 'https://nimara.xyz';
 
@@ -11,23 +10,12 @@ export function GET() {
 		{ url: '/writings', priority: '0.8', changefreq: 'weekly' }
 	];
 
-	// Add blog posts
-	try {
-		const postsDir = 'src/posts';
-		const files = readdirSync(postsDir).filter((f) => f.endsWith('.md'));
-
-		for (const file of files) {
-			const content = readFileSync(join(postsDir, file), 'utf-8');
-			const dateMatch = content.match(/date:\s*["']?(.+?)["']?\s*$/m);
-			const slug = file.replace('.md', '');
-			pages.push({
-				url: `/writings/${slug}`,
-				priority: '0.6',
-				changefreq: 'monthly'
-			});
-		}
-	} catch {
-		// Ignore errors
+	for (const post of getAllPosts()) {
+		pages.push({
+			url: `/writings/${post.slug}`,
+			priority: '0.6',
+			changefreq: 'monthly'
+		});
 	}
 
 	const xml = `<?xml version="1.0" encoding="UTF-8"?>
