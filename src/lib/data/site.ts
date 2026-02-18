@@ -44,6 +44,14 @@ export const siteData = {
 	] as Film[],
 	projects: [
 		{
+			id: 'azoth',
+			title: 'Azoth',
+			description:
+				'A deterministic EVM bytecode obfuscator written in Rust.',
+			tags: ['rust', 'evm', 'privacy'],
+			githubUrl: 'https://github.com/mirageprivacy/azoth'
+		},
+		{
 			id: 'liquity-ir',
 			title: 'Liquity Autonomous IR Manager',
 			description:

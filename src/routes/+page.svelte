@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { Github, Linkedin, Mail, Film, X } from 'lucide-svelte';
+	import { Github, Linkedin, Mail, Film } from 'lucide-svelte';
 	import {
 		ThemeToggle,
 		GlitchText,
 		AsciiArt,
 		InteractiveSection,
-		TelegramIcon
+		TelegramIcon,
+		XIcon
 	} from '$lib/components';
 	import { siteData } from '$lib/data/site';
 
@@ -21,8 +22,15 @@
 	let { data }: Props = $props();
 </script>
 
+<svelte:head>
+	<title>Nima Rasooli — Rust Developer & Low-Level Engineer</title>
+	<meta name="description" content="Nima Rasooli — Rust programmer, low-level compute enthusiast, and founder of Mirage. Building privacy tools, blockchain infrastructure, and systems software from Berlin." />
+	<link rel="canonical" href="https://nimara.xyz" />
+</svelte:head>
+
 <div class="min-h-screen p-4">
 	<div class="container mx-auto">
+		<h1 class="sr-only">Nima Rasooli — Rust Developer & Low-Level Engineer</h1>
 		<header class="flex justify-between items-center border-b border-theme pb-4">
 			<div class="text-lg">
 				<span>~/{siteData.name.toLowerCase()}</span>
@@ -30,7 +38,7 @@
 			</div>
 			<div class="flex items-center gap-4">
 				<ThemeToggle />
-				<nav class="hidden md:flex gap-6">
+				<nav class="hidden md:flex gap-6" aria-label="Main navigation">
 					<a href="#about" class="text-theme-primary hover:text-theme-secondary transition-colors"
 						>./about</a
 					>
@@ -62,7 +70,7 @@
 					{/if}
 					<div class="mt-4 border-t border-theme pt-4">
 						<p class="text-theme-secondary mb-2">$ whoami</p>
-						<p class="text-sm">{siteData.tagline}</p>
+						<p class="text-sm"><span class="text-theme-secondary font-bold">Nima Rasooli.</span> {siteData.tagline}</p>
 					</div>
 				{/snippet}
 			</InteractiveSection>
@@ -117,8 +125,10 @@
 				</div>
 				<div class="space-y-4">
 					{#each data.posts as post}
-						<div class="border border-theme p-4">
-							<div class="text-xs mb-2">{post.date}</div>
+						<article class="border border-theme p-4">
+							<div class="text-xs mb-2">
+								<time datetime={post.date}>{post.date}</time>
+							</div>
 							<h3 class="text-theme-secondary mb-2">
 								<a href="/writings/{post.slug}" class="hover:underline">{post.title}</a>
 							</h3>
@@ -128,7 +138,7 @@
 									<span class="border border-theme px-2 py-1 text-xs">{tag}</span>
 								{/each}
 							</div>
-						</div>
+						</article>
 					{/each}
 				</div>
 				<div class="mt-4 text-center">
@@ -175,6 +185,7 @@
 										class="text-theme-primary hover:text-theme-secondary"
 										target="_blank"
 										rel="noopener noreferrer"
+										aria-label="{project.title} on GitHub"
 									>
 										<Github class="h-4 w-4" />
 									</a>
@@ -260,13 +271,14 @@
 					<span class="text-theme-secondary">"© {new Date().getFullYear()}"</span>
 					<span class="text-theme-muted ml-2">({__COMMIT_HASH__.slice(0, 7)})</span>
 				</div>
-				<div class="flex gap-6">
+				<nav class="flex gap-6" aria-label="Social links">
 					{#if siteData.socialLinks.github}
 						<a
 							href={siteData.socialLinks.github}
 							class="text-theme-primary hover:text-theme-secondary transition-colors"
 							target="_blank"
 							rel="noopener noreferrer"
+							aria-label="GitHub"
 						>
 							<Github class="h-4 w-4" />
 						</a>
@@ -277,8 +289,9 @@
 							class="text-theme-primary hover:text-theme-secondary transition-colors"
 							target="_blank"
 							rel="noopener noreferrer"
+							aria-label="X (Twitter)"
 						>
-							<X class="h-4 w-4" />
+							<XIcon class="h-4 w-4" />
 						</a>
 					{/if}
 					{#if siteData.socialLinks.linkedin}
@@ -287,6 +300,7 @@
 							class="text-theme-primary hover:text-theme-secondary transition-colors"
 							target="_blank"
 							rel="noopener noreferrer"
+							aria-label="LinkedIn"
 						>
 							<Linkedin class="h-4 w-4" />
 						</a>
@@ -297,6 +311,7 @@
 							class="text-theme-primary hover:text-theme-secondary transition-colors"
 							target="_blank"
 							rel="noopener noreferrer"
+							aria-label="Email"
 						>
 							<Mail class="h-4 w-4" />
 						</a>
@@ -307,6 +322,7 @@
 							class="text-theme-primary hover:text-theme-secondary transition-colors"
 							target="_blank"
 							rel="noopener noreferrer"
+							aria-label="Letterboxd"
 						>
 							<Film class="h-4 w-4" />
 						</a>
@@ -317,11 +333,12 @@
 							class="text-theme-primary hover:text-theme-secondary transition-colors"
 							target="_blank"
 							rel="noopener noreferrer"
+							aria-label="Telegram"
 						>
 							<TelegramIcon class="h-4 w-4" />
 						</a>
 					{/if}
-				</div>
+				</nav>
 			</div>
 		</footer>
 	</div>

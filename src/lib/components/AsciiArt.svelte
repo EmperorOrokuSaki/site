@@ -31,9 +31,10 @@
 		const particles: Particle[] = [];
 		let mousePos = { x: 0, y: 0 };
 		let lastEmitTime = 0;
-		let animationId: number;
+		let animationId: number | null = null;
 		const chars =
 			'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/';
+		let cachedAsciiColor = '';
 
 		function updateCanvasSize() {
 			if (!container || !canvas) return;
@@ -74,9 +75,12 @@
 			if (!ctx) return;
 
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			const asciiColor =
-				getComputedStyle(document.documentElement).getPropertyValue('--ascii-color').trim() ||
-				'#22c55e';
+
+			if (!cachedAsciiColor || timestamp % 1000 < 16) {
+				cachedAsciiColor =
+					getComputedStyle(document.documentElement).getPropertyValue('--ascii-color').trim() ||
+					'#22c55e';
+			}
 
 			emitParticles(timestamp);
 
@@ -88,7 +92,7 @@
 
 				const opacity = 1 - p.life / p.maxLife;
 				ctx.font = `${p.size}px monospace`;
-				ctx.fillStyle = `${asciiColor}${Math.round(opacity * 255)
+				ctx.fillStyle = `${cachedAsciiColor}${Math.round(opacity * 255)
 					.toString(16)
 					.padStart(2, '0')}`;
 				ctx.fillText(p.char, p.x, p.y);
@@ -98,19 +102,38 @@
 				}
 			}
 
-			animationId = requestAnimationFrame(animate);
+			// Only keep animating if there are particles or hovering
+			if (particles.length > 0 || isHovering) {
+				animationId = requestAnimationFrame(animate);
+			} else {
+				animationId = null;
+			}
+		}
+
+		function startAnimation() {
+			if (animationId === null) {
+				animationId = requestAnimationFrame(animate);
+			}
+		}
+
+		function handleMouseEnter() {
+			isHovering = true;
+			startAnimation();
+		}
+
+		function handleMouseLeave() {
+			isHovering = false;
 		}
 
 		updateCanvasSize();
 		window.addEventListener('resize', updateCanvasSize);
 		container?.addEventListener('mousemove', handleMouseMove);
-		animationId = requestAnimationFrame(animate);
 
 		return () => {
 			clearTimeout(timer);
 			window.removeEventListener('resize', updateCanvasSize);
 			container?.removeEventListener('mousemove', handleMouseMove);
-			cancelAnimationFrame(animationId);
+			if (animationId !== null) cancelAnimationFrame(animationId);
 		};
 	});
 </script>
@@ -118,10 +141,10 @@
 <div
 	class="flex justify-center relative overflow-hidden"
 	bind:this={container}
-	onmouseenter={() => (isHovering = true)}
-	onmouseleave={() => (isHovering = false)}
+	onmouseenter={() => { isHovering = true; }}
+	onmouseleave={() => { isHovering = false; }}
 	role="img"
-	aria-label="ASCII art"
+	aria-label="ASCII art portrait"
 >
 	<pre
 		class="whitespace-pre max-h-[400px]"

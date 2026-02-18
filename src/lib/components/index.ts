@@ -4,3 +4,4 @@ export { default as AsciiArt } from './AsciiArt.svelte';
 export { default as ScratchReveal } from './ScratchReveal.svelte';
 export { default as InteractiveSection } from './InteractiveSection.svelte';
 export { default as TelegramIcon } from './TelegramIcon.svelte';
+export { default as XIcon } from './XIcon.svelte';
