@@ -1,18 +1,8 @@
 import { error } from '@sveltejs/kit';
-import { readFileSync, readdirSync } from 'fs';
-import { join } from 'path';
 import { marked } from 'marked';
 import { createHighlighter } from 'shiki';
+import { getPost, getAllPosts, getPostSlugs } from '$lib/server/posts';
 
-interface PostMeta {
-	slug: string;
-	title: string;
-	date: string;
-	excerpt: string;
-	tags: string[];
-}
-
-// Create highlighter once
 let highlighter: Awaited<ReturnType<typeof createHighlighter>> | null = null;
 
 async function getHighlighter() {
@@ -39,19 +29,7 @@ async function getHighlighter() {
 }
 
 export function entries() {
-	try {
-		const postsDir = 'src/posts';
-		const files = readdirSync(postsDir).filter((f) => f.endsWith('.md'));
-		return files.map((file) => ({ slug: file.replace('.md', '') }));
-	} catch {
-		return [];
-	}
-}
-
-function calculateReadingTime(content: string): number {
-	const wordsPerMinute = 200;
-	const wordCount = content.trim().split(/\s+/).length;
-	return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+	return getPostSlugs().map((slug) => ({ slug }));
 }
 
 function extractToc(content: string): Array<{ id: string; text: string; level: number }> {
@@ -72,104 +50,17 @@ function extractToc(content: string): Array<{ id: string; text: string; level: n
 	return toc;
 }
 
-function getAllPosts(): PostMeta[] {
-	const posts: PostMeta[] = [];
-	try {
-		const postsDir = 'src/posts';
-		const files = readdirSync(postsDir).filter((f) => f.endsWith('.md'));
-
-		for (const file of files) {
-			const content = readFileSync(join(postsDir, file), 'utf-8');
-			const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-
-			if (frontmatterMatch) {
-				const frontmatter = frontmatterMatch[1];
-				const meta: Partial<PostMeta> = { slug: file.replace('.md', '') };
-
-				const titleMatch = frontmatter.match(/title:\s*["']?(.+?)["']?\s*$/m);
-				const dateMatch = frontmatter.match(/date:\s*["']?(.+?)["']?\s*$/m);
-				const excerptMatch =
-					frontmatter.match(/excerpt:\s*["']?(.+?)["']?\s*$/m) ||
-					frontmatter.match(/description:\s*["']?(.+?)["']?\s*$/m);
-				const tagsMatch = frontmatter.match(/tags:\s*\[([^\]]*)\]/);
-				const tagMatch = frontmatter.match(/tag:\s*["']?(.+?)["']?\s*$/m);
-
-				if (titleMatch) meta.title = titleMatch[1];
-				if (dateMatch) meta.date = dateMatch[1];
-				if (excerptMatch) meta.excerpt = excerptMatch[1];
-				if (tagsMatch) {
-					meta.tags = tagsMatch[1]
-						.split(',')
-						.map((t) => t.trim().replace(/["']/g, ''))
-						.filter(Boolean);
-				} else if (tagMatch) {
-					meta.tags = tagMatch[1]
-						.split(',')
-						.map((t) => t.trim().replace(/["']/g, ''))
-						.filter(Boolean);
-				} else {
-					meta.tags = [];
-				}
-
-				posts.push(meta as PostMeta);
-			}
-		}
-
-		posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-	} catch {
-		// Ignore errors
-	}
-
-	return posts;
-}
-
 export async function load({ params }) {
 	const { slug } = params;
 
 	try {
-		// Read the raw file
-		const rawContent = readFileSync(`src/posts/${slug}.md`, 'utf-8');
-		const frontmatterMatch = rawContent.match(/^---\n([\s\S]*?)\n---/);
+		const parsed = getPost(slug);
+		if (!parsed) throw new Error('No frontmatter');
 
-		let title = '';
-		let date = '';
-		let excerpt = '';
-		let tags: string[] = [];
+		const { meta, body } = parsed;
+		const toc = extractToc(body);
 
-		if (frontmatterMatch) {
-			const frontmatter = frontmatterMatch[1];
-			const titleMatch = frontmatter.match(/title:\s*["']?(.+?)["']?\s*$/m);
-			const dateMatch = frontmatter.match(/date:\s*["']?(.+?)["']?\s*$/m);
-			const excerptMatch =
-				frontmatter.match(/excerpt:\s*["']?(.+?)["']?\s*$/m) ||
-				frontmatter.match(/description:\s*["']?(.+?)["']?\s*$/m);
-			const tagsMatch = frontmatter.match(/tags:\s*\[([^\]]*)\]/);
-			const tagMatch = frontmatter.match(/tag:\s*["']?(.+?)["']?\s*$/m);
-
-			if (titleMatch) title = titleMatch[1];
-			if (dateMatch) date = dateMatch[1];
-			if (excerptMatch) excerpt = excerptMatch[1];
-			if (tagsMatch) {
-				tags = tagsMatch[1]
-					.split(',')
-					.map((t) => t.trim().replace(/["']/g, ''))
-					.filter(Boolean);
-			} else if (tagMatch) {
-				tags = tagMatch[1]
-					.split(',')
-					.map((t) => t.trim().replace(/["']/g, ''))
-					.filter(Boolean);
-			}
-		}
-
-		const bodyContent = rawContent.slice(frontmatterMatch?.[0].length || 0);
-		const readingTime = calculateReadingTime(bodyContent);
-		const toc = extractToc(bodyContent);
-
-		// Get shiki highlighter
 		const hl = await getHighlighter();
-
-		// Configure marked with syntax highlighting
 		const renderer = new marked.Renderer();
 
 		renderer.code = function ({ text, lang }) {
@@ -194,23 +85,15 @@ export async function load({ params }) {
 		};
 
 		marked.setOptions({ renderer });
+		const contentHtml = await marked.parse(body);
 
-		// Parse markdown to HTML
-		const contentHtml = await marked.parse(bodyContent);
-
-		// Get prev/next posts
 		const allPosts = getAllPosts();
 		const currentIndex = allPosts.findIndex((p) => p.slug === slug);
 		const prevPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
 		const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
 
 		return {
-			slug,
-			title,
-			date,
-			excerpt,
-			tags,
-			readingTime,
+			...meta,
 			toc,
 			contentHtml,
 			prevPost: prevPost ? { slug: prevPost.slug, title: prevPost.title } : null,

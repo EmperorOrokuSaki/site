@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onNavigate } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import '../app.css';
 
@@ -22,6 +23,18 @@
 			document.documentElement.classList.toggle('light', savedTheme === 'light');
 		}
 	});
+
+	// View transitions for smooth page navigations
+	onNavigate((navigation) => {
+		if (!document.startViewTransition) return;
+
+		return new Promise((resolve) => {
+			document.startViewTransition(async () => {
+				resolve();
+				await navigation.complete;
+			});
+		});
+	});
 </script>
 
 <svelte:head>
@@ -35,9 +48,13 @@
 	<meta property="og:description" content={defaultDescription} />
 	<meta property="og:url" content={siteUrl} />
 	<meta property="og:locale" content="en_US" />
+	<meta property="og:image" content="{siteUrl}/og.svg" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
 
 	<!-- Twitter Card -->
-	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:image" content="{siteUrl}/og.svg" />
 	<meta name="twitter:site" content="@0xNimaRa" />
 	<meta name="twitter:creator" content="@0xNimaRa" />
 	<meta name="twitter:title" content={defaultTitle} />

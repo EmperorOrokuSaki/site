@@ -215,3 +215,20 @@ pre {
 .prose strong {
 	color: var(--text-secondary);
 }
+
+/* Skip to content link */
+.skip-link {
+	position: absolute;
+	top: -100%;
+	left: 16px;
+	z-index: 100;
+	padding: 8px 16px;
+	font-size: 0.875rem;
+	background-color: var(--page-bg);
+	color: var(--text-secondary);
+	border: 1px solid var(--border-color);
+}
+
+.skip-link:focus {
+	top: 16px;
+}
