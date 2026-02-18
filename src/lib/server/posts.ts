@@ -3,6 +3,14 @@ import { join } from 'path';
 
 const POSTS_DIR = 'src/posts';
 
+function slugify(filename: string): string {
+	return filename
+		.replace(/^\d{4}-\d{2}-\d{2}\s+/, '') // strip leading date
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/(^-|-$)/g, '');
+}
+
 export interface PostMeta {
 	slug: string;
 	title: string;
@@ -63,7 +71,7 @@ export function getAllPosts(): PostMeta[] {
 
 		for (const file of files) {
 			const content = readFileSync(join(POSTS_DIR, file), 'utf-8');
-			const parsed = parseFrontmatter(content, file.replace('.md', ''));
+			const parsed = parseFrontmatter(content, slugify(file.replace('.md', '')));
 			if (parsed) posts.push(parsed.meta);
 		}
 
@@ -75,15 +83,24 @@ export function getAllPosts(): PostMeta[] {
 }
 
 export function getPost(slug: string) {
-	const content = readFileSync(join(POSTS_DIR, `${slug}.md`), 'utf-8');
-	return parseFrontmatter(content, slug);
+	// Try exact filename first, then search by slugified name
+	try {
+		const content = readFileSync(join(POSTS_DIR, `${slug}.md`), 'utf-8');
+		return parseFrontmatter(content, slug);
+	} catch {
+		const files = readdirSync(POSTS_DIR).filter((f) => f.endsWith('.md'));
+		const file = files.find((f) => slugify(f.replace('.md', '')) === slug);
+		if (!file) return null;
+		const content = readFileSync(join(POSTS_DIR, file), 'utf-8');
+		return parseFrontmatter(content, slug);
+	}
 }
 
 export function getPostSlugs(): string[] {
 	try {
 		return readdirSync(POSTS_DIR)
 			.filter((f) => f.endsWith('.md'))
-			.map((f) => f.replace('.md', ''));
+			.map((f) => slugify(f.replace('.md', '')));
 	} catch {
 		return [];
 	}
