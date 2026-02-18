@@ -31,7 +31,7 @@
 </script>
 
 <svelte:head>
-	<title>Nima Rasooli — Rust Developer & Low-Level Engineer</title>
+	<title>Nima Rasooli - Home</title>
 	<meta name="description" content="Nima Rasooli — Rust programmer, low-level compute enthusiast, and founder of Mirage. Building privacy tools, blockchain infrastructure, and systems software from Berlin." />
 	<link rel="canonical" href="https://nimara.xyz" />
 </svelte:head>
