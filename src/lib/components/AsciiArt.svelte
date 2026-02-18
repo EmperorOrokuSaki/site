@@ -21,13 +21,8 @@
 	let container: HTMLDivElement;
 	let canvas: HTMLCanvasElement;
 	let isHovering = $state(false);
-	let isRendered = $state(false);
 
 	onMount(() => {
-		const timer = setTimeout(() => {
-			isRendered = true;
-		}, 100);
-
 		const particles: Particle[] = [];
 		let mousePos = { x: 0, y: 0 };
 		let lastEmitTime = 0;
@@ -130,7 +125,6 @@
 		container?.addEventListener('mousemove', handleMouseMove);
 
 		return () => {
-			clearTimeout(timer);
 			window.removeEventListener('resize', updateCanvasSize);
 			container?.removeEventListener('mousemove', handleMouseMove);
 			if (animationId !== null) cancelAnimationFrame(animationId);
@@ -149,6 +143,6 @@
 	<pre
 		class="whitespace-pre max-h-[400px]"
 		style="font-size: 4px; line-height: 1; contain: content; transform: translateZ(0); color: var(--ascii-color); user-select: none;"
-		>{isRendered ? art : ''}</pre>
+		>{art}</pre>
 	<canvas bind:this={canvas} class="absolute pointer-events-none" style="z-index: 1;"></canvas>
 </div>
