@@ -1,10 +1,16 @@
 # Nima Rasooli
 
-> Rust programmer. Low-level compute enthusiast. Founder of Mirage. Based in Berlin.
+> Rust programmer. Low-level compute enthusiast. A 22-year-old curious George living in Berlin.
 
 ## About
 
-Nima Rasooli is a Rust developer specializing in low-level systems programming, blockchain infrastructure, and privacy technology. He is the founder of Mirage, a company making stablecoin privacy accessible and scalable. He writes low-level Rust, builds EVM tooling, and has deep experience in smart contract security and decentralized infrastructure.
+I write Rust and occasionally look up to remember why. Systems engineering resonates with my curiosity to understand how things truly work. I like knowing what's underneath, how it moves, and how I can build something real from it. I love creating. It's the one thing that always makes sense to me. I think about film and philosophy more than I talk about them. They shape how I see the world, and I try to let that shape my work too.
+
+## Current Focus
+
+- **Mirage** — https://www.mirageprivacy.com/
+- **Hyperion** — https://en.wikipedia.org/wiki/Hyperion_(Simmons_novel)
+- **Formal Verification** — https://en.wikipedia.org/wiki/Formal_verification
 
 ## Current Role
 
