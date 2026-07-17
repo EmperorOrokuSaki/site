@@ -24,24 +24,22 @@ export interface SocialLinks {
 	telegram?: string;
 }
 
-export interface Film {
+export interface Focus {
 	title: string;
-	director?: string;
+	url: string;
 }
 
 export const siteData = {
 	name: 'Nima',
-	tagline: 'Rust programmer. Low-level compute enthusiast. A curious George living in Berlin.',
+	tagline: 'Rust programmer. Low-level compute enthusiast. A 22-year-old curious George living in Berlin.',
 	about: [
-		"I write low-level Rust and occasionally look up to remember why. Low-level computing resonates with my curiosity to understand how things truly work. I like knowing what's underneath, how it moves, and how I can build something real from it. I love creating. It's the one thing that always makes sense to me. I think about film and philosophy more than I talk about them. They shape how I see the world, and I try to let that shape my work too."
+		"I write Rust and occasionally look up to remember why. Systems engineering resonates with my curiosity to understand how things truly work. I like knowing what's underneath, how it moves, and how I can build something real from it. I love creating. It's the one thing that always makes sense to me. I think about film and philosophy more than I talk about them. They shape how I see the world, and I try to let that shape my work too."
 	],
-	interests: ['cinema', 'virtual machines', 'blockchains', 'philosophy'],
-	favoriteFilms: [
-		{ title: 'Stalker', director: 'Andrei Tarkovsky' },
-		{ title: 'Dogville', director: 'Lars von Trier' },
-		{ title: 'Dune: Part Two', director: 'Denis Villeneuve' },
-		{ title: 'Birds', director: 'Alfred Hitchcock' }
-	] as Film[],
+	currentFocus: [
+		{ title: 'Mirage', url: 'https://www.mirageprivacy.com/' },
+		{ title: 'Hyperion', url: 'https://en.wikipedia.org/wiki/Hyperion_(Simmons_novel)' },
+		{ title: 'Formal Verification', url: 'https://en.wikipedia.org/wiki/Formal_verification' }
+	] as Focus[],
 	projects: [
 		{
 			id: 'azoth',

@@ -113,25 +113,21 @@
 							<p class="mb-4 text-sm">{paragraph}</p>
 						{/each}
 					</div>
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div>
 						<div class="border border-theme p-4">
-							<h3 class="text-theme-secondary mb-2 text-sm">$ ls favorite_films/</h3>
+							<h3 class="text-theme-secondary mb-2 text-sm">$ ls current_focus/</h3>
 							<ul class="space-y-1 text-xs">
-								{#each siteData.favoriteFilms as film}
+								{#each siteData.currentFocus as focus}
 									<li>
-										{film.title}
-										{#if film.director}
-											<span class="text-theme-muted">// {film.director}</span>
-										{/if}
+										<a
+											href={focus.url}
+											class="hover:underline"
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											{focus.title}
+										</a>
 									</li>
-								{/each}
-							</ul>
-						</div>
-						<div class="border border-theme p-4">
-							<h3 class="text-theme-secondary mb-2 text-sm">$ ls interests/</h3>
-							<ul class="space-y-1 text-xs">
-								{#each siteData.interests as interest}
-									<li>{interest}</li>
 								{/each}
 							</ul>
 						</div>
