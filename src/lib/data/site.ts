@@ -29,6 +29,15 @@ export interface Focus {
 	url: string;
 }
 
+export interface Talk {
+	title: string;
+	description: string;
+	conference: string;
+	date: string;
+	location: string;
+	videoUrl: string;
+}
+
 export const siteData = {
 	name: 'Nima',
 	tagline: 'Rust programmer. Low-level compute enthusiast. A 22-year-old curious George living in Berlin.',
@@ -40,6 +49,17 @@ export const siteData = {
 		{ title: 'Hyperion', url: 'https://en.wikipedia.org/wiki/Hyperion_(Simmons_novel)' },
 		{ title: 'Formal Verification', url: 'https://en.wikipedia.org/wiki/Formal_verification' }
 	] as Focus[],
+	talks: [
+		{
+			title: 'The Best Privacy App Is the One People Actually Use',
+			description:
+				'A talk about why privacy tools only matter when people can actually use them. I share the personal experiences that led me to rethink private transactions and build a solution I would use myself.',
+			conference: 'Privacy Matters - BREW Conference',
+			date: '2026-06-20',
+			location: 'Funkhaus Berlin, Berlin',
+			videoUrl: 'https://www.youtube.com/watch?v=TR4pzkb3TIo'
+		}
+	] as Talk[],
 	projects: [
 		{
 			id: 'azoth',
