@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Github, Linkedin, Mail, Film, Menu, X } from 'lucide-svelte';
+	import { Github, Linkedin, Mail, Film, Menu, X, Youtube } from 'lucide-svelte';
 	import {
 		ThemeToggle,
 		GlitchText,
@@ -25,6 +25,7 @@
 	const navLinks = [
 		{ href: '#about', label: './about' },
 		{ href: '#writings', label: './writings' },
+		{ href: '#talks', label: './talks' },
 		{ href: '#projects', label: './projects' },
 		{ href: '#work', label: './work' }
 	];
@@ -168,6 +169,39 @@
 					>
 						ls --all
 					</a>
+				</div>
+			</section>
+
+			<section id="talks" class="mb-16">
+				<div class="border-b border-theme mb-4 pb-2 flex items-center">
+					<h2 class="text-xl">
+						<span class="text-theme-secondary">~/{siteData.name.toLowerCase()}</span>
+						<span>$ ls -la</span>
+						<span class="text-theme-secondary">talks/</span>
+					</h2>
+				</div>
+				<div class="space-y-4">
+					{#each siteData.talks as talk}
+						<article class="border border-theme p-4">
+							<div class="flex flex-wrap gap-x-4 gap-y-1 text-xs mb-3">
+								<time datetime={talk.date}>{talk.date}</time>
+								<span>{talk.conference}</span>
+								<span>{talk.location}</span>
+							</div>
+							<h3 class="text-theme-secondary">
+								<a
+									href={talk.videoUrl}
+									class="inline-flex items-center gap-2 hover:underline"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<Youtube class="h-4 w-4 shrink-0" aria-hidden="true" />
+									{talk.title}
+								</a>
+							</h3>
+							<p class="text-xs mt-3">{talk.description}</p>
+						</article>
+					{/each}
 				</div>
 			</section>
 
